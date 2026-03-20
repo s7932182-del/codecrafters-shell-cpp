@@ -13,13 +13,13 @@ int main() {
 
   std::string input;
    
-  // std::cin >> input;
+  std::cin >> input;
 
-  // std::cerr << input << ": command not found" << std::endl;
+  std::cerr << input << ": command not found" << std::endl;
 
 
-  std::getline(std::cin, input);
-  std::cout << input << ": command not found" << std::endl;
+  // std::getline(std::cin, input);
+  // std::cout << input << ": command not found" << std::endl;
 
   
 
