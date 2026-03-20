@@ -1,27 +1,27 @@
 #include <iostream>
 #include <string>
 
-int main() {
-  // Flush after every std::cout / std:cerr
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
+int main()
+{
 
-  // TODO: Uncomment the code below to pass the first stage
-  std::cout << "$ ";
+  while (true)
+  {
 
-  // * Handle Invalid command
+    // Flush after every std::cout / std:cerr
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
 
-  std::string input;
-   
-  std::cin >> input;
+    // TODO: Uncomment the code below to pass the first stage
+    std::cout << "$ ";
 
-  std::cerr << input << ": command not found" << std::endl;
+    // * Handle Invalid command
 
+    std::string input;
 
-  // std::getline(std::cin, input);
-  // std::cout << input << ": command not found" << std::endl;
+    // std::cin >> input;
+    // std::cerr << input << ": command not found" << std::endl;
 
-  
-
+    std::getline(std::cin, input);
+    std::cout << input << ": command not found" << std::endl;
+  }
 }
-
