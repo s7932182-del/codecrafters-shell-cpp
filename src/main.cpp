@@ -41,6 +41,14 @@ int main()
     else if (l_trim_command.substr(0,5) == "echo ")
     {
       std::cout << l_trim_command.substr(5) << std::endl;
+    }else if(l_trim_command.substr(0,5) == "type ") {
+        std::string builtin = l_trim_command.substr(5);
+        if(builtin == "echo" || builtin =="type"  || builtin == "exit") {
+           std::cout << builtin <<  " is  a shell builtin"  << std::endl;
+        }else {
+           std:: cout << "invalid_command: not found" << std::endl; 
+        }
+
     }
     else
     {
