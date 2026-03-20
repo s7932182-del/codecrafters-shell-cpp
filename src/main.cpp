@@ -38,7 +38,7 @@ int main()
     
     if(input == "exit") break;
     if(echo_command == "echo") {
-       std::cout << l_trim_command.substr(4) << std::endl;
+       std::cout << l_trim_command.substr(5) << std::endl;
     }
     std::cout << input << ": command not found" << std::endl;
   }
