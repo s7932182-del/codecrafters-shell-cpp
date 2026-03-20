@@ -46,8 +46,8 @@ int main()
         if(builtin == "echo" || builtin =="type"  || builtin == "exit") {
            std::cout << builtin <<  " is a shell builtin"  << std::endl;
         }else {
-           std:: cout << "invalid_command: not found" << std::endl; 
-        }
+           std:: cout << builtin <<  ": not found" << std::endl; 
+        }invalid_command:
 
     }
     else
