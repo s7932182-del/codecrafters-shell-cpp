@@ -34,11 +34,11 @@ int main()
 
     std::string l_trim_command = l_trim(input);
 
-    std::string echo_command = l_trim_command.substr(0, 4);
+    
 
     if (input == "exit")
       break;
-    else if (echo_command == "echo")
+    else if (l_trim_command.substr(0,5) == "echo ")
     {
       std::cout << l_trim_command.substr(5) << std::endl;
     }
