@@ -55,7 +55,8 @@ int main()
     else if (command == "type")
     {
 
-      std::string builtin = ps.get_argv()[0];
+      std::string builtin = ps.get_argv()[1];
+      std::cout << "builtin: " << builtin << std::endl;
       Executable exe(builtin);
 
       if (builtin == "echo" || builtin == "type" || builtin == "exit")
