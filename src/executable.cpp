@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <sstream>
 #include <unistd.h>
+#include<sys/wait.h>
 
 
 namespace fs = std::filesystem;
@@ -101,11 +102,28 @@ public:
         }
         args.push_back(nullptr);
 
-        // Execute
+
+          
+        pid_t pid = fork();
+
+        if(pid == 0) {
+
+            // Execute
         if (execv(this->exe_path.c_str(), args.data()) == -1)
         {
             // Handle error
             std::cerr << "Error occoured while exec" << std::endl;
         }
+
+        }else {
+            wait(NULL);
+        }
+
+        // // Execute
+        // if (execv(this->exe_path.c_str(), args.data()) == -1)
+        // {
+        //     // Handle error
+        //     std::cerr << "Error occoured while exec" << std::endl;
+        // }
     }
 };
