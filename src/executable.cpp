@@ -54,11 +54,13 @@ public:
             fs::path fullPath = fs::path(dir) / this->exe;
             if (fs::exists(fullPath))
             {
-                auto perms = fs::status(fullPath).permissions();
-                if ((perms & fs::perms::owner_exec) != fs::perms::none)
+                auto file_perms = fs::status(fullPath).permissions();
+                fs::perms exec_perm = fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec;
+                if ((file_perms & exec_perm) != fs::perms::none)
                 {
                     this->is_exe = true;
                     this->exe_path = fullPath.string();
+                    break;
                 }
             }
         }
