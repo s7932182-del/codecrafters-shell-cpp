@@ -33,8 +33,8 @@ public:
     }
 
     void print_arg() {
-        for(auto arg: this->argv) {
-            std::cout << arg << " ";
+        for(int i = 1 ; i < this->argv.size(); i++) {
+             std::cout << argv[i] << " ";
         }
         std::cout << std::endl;
     }
