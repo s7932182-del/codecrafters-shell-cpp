@@ -1,10 +1,10 @@
 #include <iostream>
 #include <string>
-#include<vector>
-#include <cstdlib>   // * getenv() -> method
-#include<sstream>
+#include <vector>
+#include <cstdlib> // * getenv() -> method
+#include <sstream>
 #include "executable.cpp"
-
+#include "parser.cpp"
 
 std::string l_trim(std::string &input)
 {
@@ -15,8 +15,6 @@ std::string l_trim(std::string &input)
     st++;
   return input.substr(st);
 }
-
-
 
 int main()
 {
@@ -39,32 +37,45 @@ int main()
     // std::cerr << input << ": command not found" << std::endl;
     std::getline(std::cin, input);
 
+    Parser ps(input);
+     
+    std::string command = ps.get_command();
+
+    Executable executable(command);
+
+
     std::string l_trim_command = l_trim(input);
 
-    if (input == "exit")
+    if (command == "exit")
       break;
-    else if (l_trim_command.substr(0, 5) == "echo ")
+    else if (command == "echo")
     {
-      std::cout << l_trim_command.substr(5) << std::endl;
+       ps.print_arg();
     }
-    else if (l_trim_command.substr(0, 5) == "type ")
+    else if (command == "type")
     {
 
-      std::string builtin = l_trim_command.substr(5);
+      std::string builtin = ps.get_argv()[0];
       Executable exe(builtin);
-      std::string executeablePath = exe();
 
       if (builtin == "echo" || builtin == "type" || builtin == "exit")
       {
         std::cout << builtin << " is a shell builtin" << std::endl;
-      } else if(executeablePath != "") {
-         std::cout << builtin << " is " << executeablePath << std::endl;
+      }
+      else if (exe())
+      {
+        std::cout << builtin << " is " << exe.get_path() << std::endl;
       }
       else
       {
         std::cout << builtin << ": not found" << std::endl;
       }
     }
+    
+    else if(executable()) {
+       executable(ps.get_argv());
+    }
+    
     else
     {
       std::cout << input << ": command not found" << std::endl;
