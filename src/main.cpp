@@ -56,7 +56,7 @@ int main()
     {
 
       std::string builtin = ps.get_argv()[1];
-      std::cout << "builtin: " << builtin << std::endl;
+      // std::cout << "builtin: " << builtin << std::endl;
       Executable exe(builtin);
 
       if (builtin == "echo" || builtin == "type" || builtin == "exit")
