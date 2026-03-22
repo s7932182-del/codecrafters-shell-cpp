@@ -34,12 +34,22 @@ Parser::Parser(const std::string input)
                 {
                     argument.push_back(input[st]);
                     st++;
+
+                    if (input[st] == '//')
+                    {
+                        st++;
+                        argument.push_back(input[st]);
+                        st++;
+                    }
                 }
                 st++;
-            } else if(input[st] == '\\') {
+            }
+            else if (input[st] == '\\')
+            {
                 // argument.push_back(input[st+1]);
                 st++;
-                if(st <= end) {
+                if (st <= end)
+                {
                     argument.push_back(input[st]);
                     st++;
                 }
