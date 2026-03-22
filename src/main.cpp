@@ -3,8 +3,10 @@
 #include <vector>
 #include <cstdlib> // * getenv() -> method
 #include <sstream>
-#include "executable.cpp"
-#include "parser.cpp"
+#include <unordered_map>
+#include "executable.hpp"
+#include "parser.hpp"
+#include "builtin.hpp"
 
 std::string l_trim(std::string &input)
 {
@@ -16,8 +18,19 @@ std::string l_trim(std::string &input)
   return input.substr(st);
 }
 
+
+
+void registerBuiltin() {
+     Builtin<Parser,int>::register_command("type",&TYPE::getInstance());
+     Builtin<Parser,int>::register_command("echo",&ECHO::getInstance());
+     Builtin<Parser,int>::register_command("exit",&EXIT::getInstance());
+    
+}
+
 int main()
 {
+
+  registerBuiltin();
 
   while (true)
   {
@@ -43,37 +56,24 @@ int main()
 
     Executable executable(command);
 
+    auto& builtcmd = Builtin<Parser,int>::getMap();
 
-    std::string l_trim_command = l_trim(input);
 
-    if (command == "exit")
-      break;
-    else if (command == "echo")
-    {
-       ps.print_arg();
+    // std::string l_trim_command = l_trim(input);
+
+    if(builtcmd.count(command)){
+      //  if(builtcmd[command]->execute(ps) != 1) break;
+
+       auto& cmd = builtcmd[command];
+        if(cmd->get_name() == "exit") break;
+         cmd->execute(ps);
+       continue;
+      //  return 0;
     }
-    else if (command == "type")
-    {
 
-      std::string builtin = ps.get_argv()[1];
-      // std::cout << "builtin: " << builtin << std::endl;
-      Executable exe(builtin);
-
-      if (builtin == "echo" || builtin == "type" || builtin == "exit")
-      {
-        std::cout << builtin << " is a shell builtin" << std::endl;
-      }
-      else if (exe())
-      {
-        std::cout << builtin << " is " << exe.get_path() << std::endl;
-      }
-      else
-      {
-        std::cout << builtin << ": not found" << std::endl;
-      }
-    }
+   
     
-    else if(executable()) {
+     if(executable()) {
        executable(ps.get_argv());
     }
     
