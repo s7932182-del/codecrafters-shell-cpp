@@ -35,7 +35,7 @@ Parser::Parser(const std::string input)
                     argument.push_back(input[st]);
                     st++;
 
-                    if (input[st] == '//')
+                    if (input[st] == '\\')
                     {
                         st++;
                         argument.push_back(input[st]);
