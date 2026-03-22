@@ -15,7 +15,7 @@ Parser::Parser(const std::string input)
         std::string argument;
         while (!isspace(input[st]) && st <= end)
         {
-            if ((input[st] >= 'a' && input[st] <= 'z') || input[st] == '~' ||input[st] == '/'  )
+            if ((input[st] >= 'a' && input[st] <= 'z') || input[st] == '~' ||input[st] == '/' || input[st] == '.' )
             {
 
                 if (!is_command)
