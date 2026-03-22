@@ -32,7 +32,7 @@ Parser::Parser(const std::string input)
                 st++;
                 while (input[st] != '\"')
                 {
-                    argument.push_back(input[st+1]);
+                    argument.push_back(input[st]);
                     st++;
                 }
                 st++;
