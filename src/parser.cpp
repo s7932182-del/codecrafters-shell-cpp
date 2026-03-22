@@ -26,6 +26,17 @@ Parser::Parser(const std::string input)
                 }
                 st++;
             }
+            else if (input[st] == '\"')
+            {
+
+                st++;
+                while (input[st] != '\"')
+                {
+                    argument.push_back(input[st]);
+                    st++;
+                }
+                st++;
+            }
             else
             {
 
