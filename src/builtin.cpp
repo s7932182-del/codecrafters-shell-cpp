@@ -1,4 +1,7 @@
 #include "builtin.hpp"
+#include<filesystem>
+
+namespace fs = std::filesystem;
 
 // TYPE class implementation
 TYPE::TYPE() : Builtin("type") {}
@@ -74,3 +77,26 @@ std::string EXIT::get_name()
 {
     return this->name;
 }
+
+
+
+//  PWD class Implementation
+
+
+PWD::PWD(): Builtin("pwd"){};
+
+std::string PWD::get_name()  {
+   return this->name;
+}
+
+PWD& PWD::getInstance() {
+    static PWD instance;
+    return instance;
+}
+
+
+void PWD::execute(Parser& ps) {
+   fs::path cwd  = fs::current_path();
+   std::cout << cwd << std::endl;
+}
+

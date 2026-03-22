@@ -18,13 +18,12 @@ std::string l_trim(std::string &input)
   return input.substr(st);
 }
 
-
-
-void registerBuiltin() {
-     Builtin<Parser,int>::register_command("type",&TYPE::getInstance());
-     Builtin<Parser,int>::register_command("echo",&ECHO::getInstance());
-     Builtin<Parser,int>::register_command("exit",&EXIT::getInstance());
-    
+void registerBuiltin()
+{
+  Builtin<Parser>::register_command("type", &TYPE::getInstance());
+  Builtin<Parser>::register_command("echo", &ECHO::getInstance());
+  Builtin<Parser>::register_command("exit", &EXIT::getInstance());
+  Builtin<Parser>::register_command("pwd", &PWD::getInstance());
 }
 
 int main()
@@ -51,32 +50,32 @@ int main()
     std::getline(std::cin, input);
 
     Parser ps(input);
-     
+
     std::string command = ps.get_command();
 
     Executable executable(command);
 
-    auto& builtcmd = Builtin<Parser,int>::getMap();
-
+    auto &builtcmd = Builtin<Parser>::getMap();
 
     // std::string l_trim_command = l_trim(input);
 
-    if(builtcmd.count(command)){
+    if (builtcmd.count(command))
+    {
       //  if(builtcmd[command]->execute(ps) != 1) break;
 
-       auto& cmd = builtcmd[command];
-        if(cmd->get_name() == "exit") break;
-         cmd->execute(ps);
-       continue;
+      auto &cmd = builtcmd[command];
+      if (cmd->get_name() == "exit")
+        break;
+      cmd->execute(ps);
+      continue;
       //  return 0;
     }
 
-   
-    
-     if(executable()) {
-       executable(ps.get_argv());
+    if (executable())
+    {
+      executable(ps.get_argv());
     }
-    
+
     else
     {
       std::cout << input << ": command not found" << std::endl;

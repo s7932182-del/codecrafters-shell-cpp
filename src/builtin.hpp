@@ -6,7 +6,7 @@
 #include "executable.hpp"
 #include "parser.hpp"
 
-template<typename T, typename U>
+template<typename T>
 class Builtin
 {
 protected:
@@ -30,7 +30,9 @@ public:
     }
 };
 
-class TYPE final : public Builtin<Parser,int>
+
+// ? TYPE Builtin
+class TYPE final : public Builtin<Parser>
 {
 private:
     TYPE();
@@ -41,7 +43,11 @@ public:
     std::string get_name() override;
 };
 
-class ECHO final: public Builtin<Parser,int>
+
+
+// ? ECHO Builtin
+
+class ECHO final: public Builtin<Parser>
 {
 private:
     ECHO();
@@ -52,7 +58,11 @@ public:
     std::string get_name() override;
 };
 
-class EXIT final: public Builtin<Parser,int> 
+
+
+// ? EXIT Builtin
+
+class EXIT final: public Builtin<Parser> 
 {
 private:
     EXIT();
@@ -62,5 +72,26 @@ public:
     void execute(Parser& x) override;
     std::string get_name() override;
 };
+
+
+
+
+
+
+// ? PWD Builtin
+
+class PWD final: public Builtin<Parser> 
+{
+private:
+    PWD();
+
+public:
+    static PWD &getInstance();
+    void execute(Parser& x) override;
+    std::string get_name() override;
+};
+
+
+
 
 #endif
