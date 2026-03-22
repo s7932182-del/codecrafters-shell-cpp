@@ -21,6 +21,7 @@ Parser::Parser(const std::string input)
                 st++;
                 while (input[st] != '\'')
                 {
+
                     argument.push_back(input[st]);
                     st++;
                 }
@@ -57,14 +58,15 @@ Parser::Parser(const std::string input)
             else
             {
 
-                if (!is_command)
-                {
-                    this->command.push_back(input[st]);
-                }
-
                 argument.push_back(input[st]);
                 st++;
             }
+        }
+
+        if (!is_command)
+        {
+            this->command = argument;
+            is_command = false;
         }
         is_command = true;
         this->argv.push_back(argument);

@@ -68,7 +68,7 @@ EXIT &EXIT::getInstance()
     return instance;
 }
 
-void EXIT::execute(Parser& x)
+void EXIT::execute(Parser& ps)
 {
     // return 0;
 }
