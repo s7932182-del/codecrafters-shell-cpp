@@ -96,7 +96,7 @@ PWD& PWD::getInstance() {
 
 
 void PWD::execute(Parser& ps) {
-   fs::path cwd  = fs::current_path();
+   std::string cwd  = fs::current_path();
    std::cout << cwd << std::endl;
 }
 
