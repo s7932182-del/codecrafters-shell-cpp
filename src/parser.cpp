@@ -15,7 +15,18 @@ Parser::Parser(const std::string input)
         std::string argument;
         while (!isspace(input[st]) && st <= end)
         {
-            if ((input[st] >= 'a' && input[st] <= 'z') || input[st] == '~' ||input[st] == '/' || input[st] == '.' )
+
+            if (input[st] == '\'')
+            {
+                st++;
+                while (input[st] != '\'')
+                {
+                    argument.push_back(input[st]);
+                    st++;
+                }
+                st++;
+            }
+            else
             {
 
                 if (!is_command)
@@ -24,16 +35,6 @@ Parser::Parser(const std::string input)
                 }
 
                 argument.push_back(input[st]);
-                st++;
-            }
-            else if (input[st] == '\'')
-            {
-                st++;
-                while (input[st] != '\'')
-                {
-                    argument.push_back(input[st]);
-                    st++;
-                }
                 st++;
             }
         }
