@@ -24,6 +24,7 @@ void registerBuiltin()
   Builtin<Parser>::register_command("echo", &ECHO::getInstance());
   Builtin<Parser>::register_command("exit", &EXIT::getInstance());
   Builtin<Parser>::register_command("pwd", &PWD::getInstance());
+  Builtin<Parser>::register_command("cd", &CD::getInstance());
 }
 
 int main()

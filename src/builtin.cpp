@@ -100,3 +100,39 @@ void PWD::execute(Parser& ps) {
    std::cout << cwd << std::endl;
 }
 
+
+
+//  CD Class Implementation
+
+CD::CD(): Builtin("cd"){};
+
+CD& CD::getInstance(){
+     static CD instance;
+     return instance;
+}
+
+void CD::execute(Parser& ps) {
+    std::string dir = ps.get_argv()[1];
+    try {
+
+        fs::current_path(dir);
+    }catch(const fs::filesystem_error& e) {
+
+        // std::cerr << "  What: " << e.what() << "\n";
+        // std::cerr << "  Path1: " << e.path1() << "\n";
+
+        if(e.code() == std::errc::no_such_file_or_directory) {
+             std::cerr << "cd: " << dir <<  ": No such file or directory" << std::endl;
+        }else if (e.code() == std::errc::permission_denied) {
+            std::cerr << "  Reason: Permission denied\n";
+        }
+    }
+
+
+}
+
+
+std::string CD::get_name() {
+     return this->name;
+}
+

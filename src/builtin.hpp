@@ -94,4 +94,21 @@ public:
 
 
 
+// ? CD Builtin
+
+class CD final: public Builtin<Parser> 
+{
+private:
+    CD();
+
+public:
+    static CD &getInstance();
+    void execute(Parser& x) override;
+    std::string get_name() override;
+};
+
+
+
+
+
 #endif
