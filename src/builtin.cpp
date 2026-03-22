@@ -113,6 +113,7 @@ CD& CD::getInstance(){
 
 void CD::execute(Parser& ps) {
     std::string dir = ps.get_argv()[1];
+    if(dir=="~") dir = "/home/user";
     try {
 
         fs::current_path(dir);
