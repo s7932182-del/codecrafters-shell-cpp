@@ -68,7 +68,7 @@ EXIT &EXIT::getInstance()
     return instance;
 }
 
-void EXIT::execute(Parser& ps)
+void EXIT::execute(Parser&)
 {
     // return 0;
 }
@@ -95,7 +95,7 @@ PWD& PWD::getInstance() {
 }
 
 
-void PWD::execute(Parser& ps) {
+void PWD::execute(Parser&) {
    std::string cwd  = fs::current_path();
    std::cout << cwd << std::endl;
 }
