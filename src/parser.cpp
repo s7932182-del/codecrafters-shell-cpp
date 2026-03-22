@@ -2,30 +2,62 @@
 
 Parser::Parser(const std::string input)
 {
-    std::stringstream ss(input);
-    std::string word;
-    bool command_is_appended = false;
 
-    while(ss >> word) {
-        if(!command_is_appended) {
-             this->command = word;
-             command_is_appended = true;
-        } 
-             this->argv.push_back(word);
+    // std::cout << "Input: " << input << std::endl;
+
+    int st = 0, end = input.length() - 1;
+    bool is_command = false;
+
+    while (st <= end)
+    {
+        while (isspace(input[st]) && st <= end)
+            st++;
+        std::string argument;
+        while (!isspace(input[st]) && st <= end)
+        {
+            if ((input[st] >= 'a' && input[st] <= 'z') || input[st] == '~')
+            {
+
+                if (!is_command)
+                {
+                    this->command.push_back(input[st]);
+                }
+
+                argument.push_back(input[st]);
+                st++;
+            }
+            else if (input[st] == '\'')
+            {
+                st++;
+                while (input[st] != '\'')
+                {
+                    argument.push_back(input[st]);
+                    st++;
+                }
+                st++;
+            }
         }
+        is_command = true;
+        this->argv.push_back(argument);
+        // st++;
+    }
 }
 
-std::string Parser::get_command() {
-     return this->command;
+std::string Parser::get_command()
+{
+    return this->command;
 }
 
-std::vector<std::string>& Parser::get_argv() {
-     return this->argv;
+std::vector<std::string> &Parser::get_argv()
+{
+    return this->argv;
 }
 
-void Parser::print_arg() {
-    for(int i = 1 ; i < this->argv.size(); i++) {
-         std::cout << argv[i] << " ";
+void Parser::print_arg()
+{
+    for (size_t i = 1; i < this->argv.size(); i++)
+    {
+        std::cout << argv[i] << " ";
     }
     std::cout << std::endl;
 }
