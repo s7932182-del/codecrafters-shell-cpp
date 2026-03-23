@@ -90,10 +90,13 @@ Parser::Parser(const std::string input)
         is_command = true;
         if (!argument.empty())
         {
-            if (!this->has_output_redirection)
-                this->argv.push_back(argument);
-            else
-                this->output_file = argument;
+             if(this->has_output_redirect()) {
+                 this->output_file = argument;
+             }else if(this->has_error_redirect()) {
+                 this->error_file = argument;
+             }else {
+                 this->argv.push_back(argument);
+             }
         }
         // st++;
     }

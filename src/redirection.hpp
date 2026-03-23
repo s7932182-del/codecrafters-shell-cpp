@@ -9,6 +9,7 @@
 
 class Redirection {
     std::streambuf * original;
+    
     std::ofstream file;
     
     public:

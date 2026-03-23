@@ -99,7 +99,7 @@ void Executable::operator()(Parser &ps)
         } 
 
         if(ps.has_error_redirect()) {
-             int error_file = open(ps.get_output_file().c_str() , O_WRONLY | O_CREAT, 0777);
+             int error_file = open(ps.get_error_file().c_str() , O_WRONLY | O_CREAT, 0777);
              dup2(error_file, STDERR_FILENO);
              close(error_file);
         }
