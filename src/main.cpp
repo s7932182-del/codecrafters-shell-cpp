@@ -77,6 +77,10 @@ int main()
         out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out);
       }
 
+      if(ps.has_error_redirect()) {
+         err_redirect = std::make_unique<Redirection>(ps.get_error_file(), Redirection::RTYPE::err);
+      }
+
       cmd->execute(ps);
       continue;
       //  return 0;

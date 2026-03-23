@@ -23,9 +23,9 @@ public:
     std::string get_file();
 
      std::string get_output_file() const;
-    // std::string get_error_file() const;
+    std::string get_error_file() const;
     bool has_output_redirect() const;
-    // bool has_error_redirect() const;
+    bool has_error_redirect() const;
 };
 
 #endif

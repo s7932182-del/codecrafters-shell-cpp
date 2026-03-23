@@ -63,7 +63,15 @@ Parser::Parser(const std::string input)
             }
             else if (input[st] == '>')
             {
-                this->has_output_redirection = true;
+                if(input[st-1] =='1' || isspace(input[st-1])){
+                    if(!isspace(input[st-1])) argument.pop_back();
+                    this->has_output_redirection = true;
+                } else if(input[st-1] == '2') {
+                     argument.pop_back();
+                     this->has_error_redirection = true;
+                     
+                }
+
                 st++;
             }
             else
@@ -119,4 +127,15 @@ std::string Parser::get_output_file () const
 
 bool Parser::has_output_redirect() const {
    return this->has_output_redirection;
+}
+
+
+
+bool Parser::has_error_redirect() const {
+     return this->has_error_redirection;
+}
+
+
+std::string Parser::get_error_file() const {
+     return this->error_file;
 }
