@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include "executable.hpp"
 #include "parser.hpp"
+#include<algorithm>
+#include "redirection.hpp"
 
 template<typename T>
 class Builtin
@@ -13,7 +15,9 @@ protected:
     std::string name;
 
 public:
-    Builtin(const std::string &n = "") : name(n) {}
+    Builtin(const std::string &n = "") : name(n) {
+       
+    }
     virtual void execute(T&) = 0;
     virtual std::string get_name() = 0;
     virtual ~Builtin() = default;

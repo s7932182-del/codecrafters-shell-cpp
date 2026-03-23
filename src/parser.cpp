@@ -1,4 +1,8 @@
 #include "parser.hpp"
+#include <vector>
+#include <algorithm>
+#include "redirection.hpp"
+#include <string>
 
 Parser::Parser(const std::string input)
 {
@@ -7,6 +11,8 @@ Parser::Parser(const std::string input)
 
     int st = 0, end = input.length() - 1;
     bool is_command = false;
+    this->has_output_redirection = false;
+    this->has_error_redirection = false;
 
     while (st <= end)
     {
@@ -55,10 +61,15 @@ Parser::Parser(const std::string input)
                     st++;
                 }
             }
+            else if (input[st] == '>')
+            {
+                this->has_output_redirection = true;
+                st++;
+            }
             else
             {
-
-                argument.push_back(input[st]);
+                if (!isspace(input[st]))
+                    argument.push_back(input[st]);
                 st++;
             }
         }
@@ -69,9 +80,16 @@ Parser::Parser(const std::string input)
             is_command = false;
         }
         is_command = true;
-        this->argv.push_back(argument);
+        if (!argument.empty())
+        {
+            if (!this->has_output_redirection)
+                this->argv.push_back(argument);
+            else
+                this->output_file = argument;
+        }
         // st++;
     }
+
 }
 
 std::string Parser::get_command()
@@ -91,4 +109,14 @@ void Parser::print_arg()
         std::cout << argv[i] << " ";
     }
     std::cout << std::endl;
+}
+
+std::string Parser::get_output_file () const
+{
+    return this->output_file;
+}
+
+
+bool Parser::has_output_redirect() const {
+   return this->has_output_redirection;
 }

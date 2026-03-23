@@ -7,6 +7,7 @@
 #include "executable.hpp"
 #include "parser.hpp"
 #include "builtin.hpp"
+#include "redirection.hpp"
 
 std::string l_trim(std::string &input)
 {
@@ -64,9 +65,18 @@ int main()
     {
       //  if(builtcmd[command]->execute(ps) != 1) break;
 
+      std::unique_ptr<Redirection> out_redirect;
+      std::unique_ptr<Redirection> err_redirect;
+
       auto &cmd = builtcmd[command];
       if (cmd->get_name() == "exit")
         break;
+
+      if (ps.has_output_redirect())
+      {
+        out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out);
+      }
+
       cmd->execute(ps);
       continue;
       //  return 0;
@@ -74,7 +84,14 @@ int main()
 
     if (executable())
     {
-      executable(ps.get_argv());
+      std::unique_ptr<Redirection> out_redirect;
+      std::unique_ptr<Redirection> err_redirect;
+
+      if (ps.has_output_redirect())
+      {
+        out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out);
+      }
+      executable(ps);
     }
 
     else

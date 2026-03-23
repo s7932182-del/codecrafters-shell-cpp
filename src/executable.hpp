@@ -7,6 +7,7 @@
 #include <sstream>
 #include <unistd.h>
 #include<sys/wait.h>
+#include "parser.hpp"
 
 namespace fs = std::filesystem;
 
@@ -23,7 +24,7 @@ public:
     Executable(std::string command);
     std::string get_path();
     bool operator()();
-    void operator()(const std::vector<std::string> &argv);
+    void operator()(Parser&);
 };
 
 #endif

@@ -1,4 +1,6 @@
 #include "executable.hpp"
+#include "redirection.hpp"
+#include<fcntl.h>
 
 std::vector<std::string> Executable::getEnvironmentVariable()
 {
@@ -59,15 +61,15 @@ bool Executable::operator()()
     return this->is_exe;
 }
 
-void Executable::operator()(const std::vector<std::string> &argv)
+void Executable::operator()(Parser &ps)
 {
     std::vector<char *> args;
     std::vector<std::vector<char>> arg_storage;
 
-    args.reserve(argv.size() + 1);
-    arg_storage.reserve(argv.size());
+    args.reserve(ps.get_argv().size() + 1);
+    arg_storage.reserve(ps.get_argv().size());
 
-    for (const auto &arg : argv)
+    for (const auto &arg : ps.get_argv())
     {
         std::vector<char> mutable_arg(arg.begin(), arg.end());
         mutable_arg.push_back('\0');
@@ -80,9 +82,27 @@ void Executable::operator()(const std::vector<std::string> &argv)
 
     if (pid == 0)
     {
+
+        // / Use Redirection class in child process
+  
+
+        if (ps.has_output_redirect())
+        {
+            // Create redirection object - this will redirect cout in the child
+
+            int output_file = open(ps.get_output_file().c_str(), O_WRONLY | O_CREAT , 0777);
+
+            dup2(output_file,STDOUT_FILENO);
+
+            close(output_file);
+           
+        }
+
+        // Execute the command
         if (execv(this->exe_path.c_str(), args.data()) == -1)
         {
             std::cerr << "Error occurred while exec" << std::endl;
+            exit(1);
         }
     }
     else
