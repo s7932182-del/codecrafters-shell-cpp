@@ -1,6 +1,6 @@
 #include "executable.hpp"
 #include "redirection.hpp"
-#include<fcntl.h>
+#include <fcntl.h>
 
 std::vector<std::string> Executable::getEnvironmentVariable()
 {
@@ -84,24 +84,43 @@ void Executable::operator()(Parser &ps)
     {
 
         // / Use Redirection class in child process
-  
 
         if (ps.has_output_redirect())
         {
             // Create redirection object - this will redirect cout in the child
 
-            int output_file = open(ps.get_output_file().c_str(), O_WRONLY | O_CREAT , 0777);
+            int output_file;
 
-            dup2(output_file,STDOUT_FILENO);
+            if (ps.is_append_mode())
+            {
+                output_file = open(ps.get_output_file().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0777);
+            }
+            else
+            {
+
+                output_file = open(ps.get_output_file().c_str(), O_WRONLY | O_CREAT, 0777);
+            }
+
+            dup2(output_file, STDOUT_FILENO);
 
             close(output_file);
-           
-        } 
+        }
 
-        if(ps.has_error_redirect()) {
-             int error_file = open(ps.get_error_file().c_str() , O_WRONLY | O_CREAT, 0777);
-             dup2(error_file, STDERR_FILENO);
-             close(error_file);
+        if (ps.has_error_redirect())
+        {
+            int error_file;
+
+            if (ps.is_append_mode())
+            {
+                error_file = open(ps.get_error_file().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0777);
+            }
+            else
+            {
+
+                error_file = open(ps.get_error_file().c_str(), O_WRONLY | O_CREAT, 0777);
+            }
+            dup2(error_file, STDERR_FILENO);
+            close(error_file);
         }
 
         // Execute the command

@@ -74,11 +74,12 @@ int main()
 
       if (ps.has_output_redirect())
       {
-        out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out);
+        out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out, ps);
       }
 
-      if(ps.has_error_redirect()) {
-         err_redirect = std::make_unique<Redirection>(ps.get_error_file(), Redirection::RTYPE::err);
+      if (ps.has_error_redirect())
+      {
+        err_redirect = std::make_unique<Redirection>(ps.get_error_file(), Redirection::RTYPE::err, ps);
       }
 
       cmd->execute(ps);
@@ -88,13 +89,6 @@ int main()
 
     if (executable())
     {
-      std::unique_ptr<Redirection> out_redirect;
-      std::unique_ptr<Redirection> err_redirect;
-
-      if (ps.has_output_redirect())
-      {
-        out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out);
-      }
       executable(ps);
     }
 

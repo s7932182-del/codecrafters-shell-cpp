@@ -4,11 +4,17 @@
 #include <filesystem>
 #include "parser.hpp"
 
-Redirection::Redirection(const std::string &_file, Redirection::RTYPE rtype)
+Redirection::Redirection(const std::string &_file, Redirection::RTYPE rtype, Parser& ps)
 {
+  
+   
 
+    if(ps.is_append_mode()) {
 
-    this->file.open(_file);
+        this->file.open(_file,std::ios::out | std::ios::app);
+    }else {
+         this->file.open(_file);
+    }
     if (this->file.is_open())
     {
 

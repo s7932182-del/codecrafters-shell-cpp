@@ -16,7 +16,7 @@ class Redirection {
     enum class RTYPE{err,out};
     Redirection::RTYPE type;
       
-      Redirection(const std::string& _file, RTYPE rtype);
+      Redirection(const std::string& _file, RTYPE rtype, Parser& );
       ~Redirection();
       
 

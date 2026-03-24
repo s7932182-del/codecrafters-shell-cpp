@@ -13,6 +13,7 @@ Parser::Parser(const std::string input)
     bool is_command = false;
     this->has_output_redirection = false;
     this->has_error_redirection = false;
+    this->has_append_mode = false;
 
     while (st <= end)
     {
@@ -63,13 +64,26 @@ Parser::Parser(const std::string input)
             }
             else if (input[st] == '>')
             {
-                if(input[st-1] =='1' || isspace(input[st-1])){
-                    if(!isspace(input[st-1])) argument.pop_back();
+                if (input[st - 1] == '1' || isspace(input[st - 1]))
+                {
+                    if (!isspace(input[st - 1]))
+                        argument.pop_back();
                     this->has_output_redirection = true;
-                } else if(input[st-1] == '2') {
-                     argument.pop_back();
-                     this->has_error_redirection = true;
-                     
+                    if (input[st + 1] == '>')
+                    {
+                        this->has_append_mode = true;
+                        st++;
+                    }
+                }
+                else if (input[st - 1] == '2')
+                {
+                    argument.pop_back();
+                    this->has_error_redirection = true;
+                    if (input[st + 1] == '>')
+                    {
+                        this->has_append_mode = true;
+                        st++;
+                    }
                 }
 
                 st++;
@@ -90,17 +104,21 @@ Parser::Parser(const std::string input)
         is_command = true;
         if (!argument.empty())
         {
-             if(this->has_output_redirect()) {
-                 this->output_file = argument;
-             }else if(this->has_error_redirect()) {
-                 this->error_file = argument;
-             }else {
-                 this->argv.push_back(argument);
-             }
+            if (this->has_output_redirect())
+            {
+                this->output_file = argument;
+            }
+            else if (this->has_error_redirect())
+            {
+                this->error_file = argument;
+            }
+            else
+            {
+                this->argv.push_back(argument);
+            }
         }
         // st++;
     }
-
 }
 
 std::string Parser::get_command()
@@ -122,23 +140,26 @@ void Parser::print_arg()
     std::cout << std::endl;
 }
 
-std::string Parser::get_output_file () const
+std::string Parser::get_output_file() const
 {
     return this->output_file;
 }
 
-
-bool Parser::has_output_redirect() const {
-   return this->has_output_redirection;
+bool Parser::has_output_redirect() const
+{
+    return this->has_output_redirection;
 }
 
-
-
-bool Parser::has_error_redirect() const {
-     return this->has_error_redirection;
+bool Parser::has_error_redirect() const
+{
+    return this->has_error_redirection;
 }
 
+std::string Parser::get_error_file() const
+{
+    return this->error_file;
+}
 
-std::string Parser::get_error_file() const {
-     return this->error_file;
+bool Parser::is_append_mode() const {
+    return this->has_append_mode;
 }

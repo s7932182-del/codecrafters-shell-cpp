@@ -14,6 +14,7 @@ private:
     std::string error_file;
     bool has_output_redirection;
     bool has_error_redirection;
+    bool has_append_mode;
 
 public:
     Parser(const std::string input);
@@ -26,6 +27,7 @@ public:
     std::string get_error_file() const;
     bool has_output_redirect() const;
     bool has_error_redirect() const;
+    bool is_append_mode() const;
 };
 
 #endif
