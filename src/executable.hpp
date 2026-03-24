@@ -18,8 +18,6 @@ private:
     bool is_exe = false;
     std::string exe_path = "";
 
-    std::vector<std::string> getEnvironmentVariable();
-
 public:
     Executable(std::string command);
     std::string get_path();

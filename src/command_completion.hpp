@@ -7,6 +7,12 @@
 #include "parser.hpp"
 #include <readline/readline.h>
 #include <readline/history.h>
+#include "function.hpp"
+#include<filesystem>
+
+namespace fs = std::filesystem;
+
+
 
 class TabCompletor
 {
@@ -32,33 +38,52 @@ private:
                 }
             }
 
+
+
+            // Tab completion for executable
+
+            std::vector<std::string> directories = getExePath();
+
+
+            for(auto dir: directories) {
+
+                for(const auto& entry: fs::directory_iterator(dir)) {
+                     std::string exe = entry.path().filename().string();
+
+                     if(exe.find(prefix) == 0){
+                         matches.push_back(exe);
+                     }
+                }
+            }
+
+
+
             match_index = 0;
 
             // if(const)
         }
-    
-    
-        if (match_index < matches.size()) {
+
+        if (match_index < matches.size())
+        {
             return strdup(matches[match_index++].c_str());
         }
-        
+
         return nullptr;
     }
 
     TabCompletor();
+
 public:
-
-
-    static char **  my_completion(const char * text,int start,int /*end */) {
-        if(start == 0) {
-            return rl_completion_matches(text,command_generator);
+    static char **my_completion(const char *text, int start, int /*end */)
+    {
+        if (start == 0)
+        {
+            return rl_completion_matches(text, command_generator);
         }
 
         return nullptr;
     }
 };
-
-
 
 // Define static members
 std::vector<std::string> TabCompletor::matches;

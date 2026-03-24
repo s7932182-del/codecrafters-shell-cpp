@@ -1,38 +1,13 @@
 #include "executable.hpp"
 #include "redirection.hpp"
 #include <fcntl.h>
+#include "function.hpp"
 
-std::vector<std::string> Executable::getEnvironmentVariable()
-{
-    const char *PATH_VARIABLE = std::getenv("PATH");
 
-    if (PATH_VARIABLE == nullptr)
-        std::cerr << "Path variable is not found" << std::endl;
-
-    std::stringstream ss(PATH_VARIABLE);
-    std::vector<std::string> directories;
-    std::string dir;
-
-#ifdef _WIN32
-    char delimiter = ';';
-#else
-    char delimiter = ':';
-#endif
-
-    while (std::getline(ss, dir, delimiter))
-    {
-        if (!dir.empty())
-        {
-            directories.push_back(dir);
-        }
-    }
-
-    return directories;
-}
 
 Executable::Executable(std::string command) : exe(command)
 {
-    std::vector<std::string> directories = getEnvironmentVariable();
+    std::vector<std::string> directories = getExePath();
 
     for (auto dir : directories)
     {
