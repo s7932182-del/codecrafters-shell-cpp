@@ -8,6 +8,9 @@
 #include "parser.hpp"
 #include "builtin.hpp"
 #include "redirection.hpp"
+#include <readline/readline.h>
+#include <readline/history.h>
+#include "command_completion.hpp"
 
 std::string l_trim(std::string &input)
 {
@@ -33,68 +36,138 @@ int main()
 
   registerBuiltin();
 
-  while (true)
+  rl_attempted_completion_function = TabCompletor::my_completion;
+  rl_bind_key('\t', rl_complete);
+
+  std::string input;
+  char *line;
+
+  while ((line = readline("$ ")) != nullptr)
   {
+    // input = line;
+    // free(line);
 
-    // Flush after every std::cout / std:cerr
-    std::cout << std::unitbuf;
-    std::cerr << std::unitbuf;
-
-    // TODO: Uncomment the code below to pass the first stage
-    std::cout << "$ ";
-
-    // * Handle Invalid command
-
-    std::string input;
-
-    // std::cin >> input;
-    // std::cerr << input << ": command not found" << std::endl;
-    std::getline(std::cin, input);
-
-    Parser ps(input);
-
-    std::string command = ps.get_command();
-
-    Executable executable(command);
-
-    auto &builtcmd = Builtin<Parser>::getMap();
-
-    // std::string l_trim_command = l_trim(input);
-
-    if (builtcmd.count(command))
+    if (strlen(line) > 0)
     {
-      //  if(builtcmd[command]->execute(ps) != 1) break;
+      add_history(line);
 
-      std::unique_ptr<Redirection> out_redirect;
-      std::unique_ptr<Redirection> err_redirect;
+      std::string input(line);
 
-      auto &cmd = builtcmd[command];
-      if (cmd->get_name() == "exit")
-        break;
+      // ? Parse the input - call parser constructor
 
-      if (ps.has_output_redirect())
+      Parser ps(input);
+
+      std::string command = ps.get_command();
+
+      Executable executable(command);
+
+      auto &builtcmd = Builtin<Parser>::getMap();
+
+      if (builtcmd.count(command))
       {
-        out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out, ps);
+        //     //  if(builtcmd[command]->execute(ps) != 1) break;
+
+        std::unique_ptr<Redirection> out_redirect;
+        std::unique_ptr<Redirection> err_redirect;
+
+        auto &cmd = builtcmd[command];
+        if (cmd->get_name() == "exit")
+        {
+          free(line);
+          break;
+        }
+
+        if (ps.has_output_redirect())
+        {
+          out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out, ps);
+        }
+
+        if (ps.has_error_redirect())
+        {
+          err_redirect = std::make_unique<Redirection>(ps.get_error_file(), Redirection::RTYPE::err, ps);
+        }
+
+        cmd->execute(ps);
+        continue;
+        //     //  return 0;
       }
 
-      if (ps.has_error_redirect())
+      if (executable())
       {
-        err_redirect = std::make_unique<Redirection>(ps.get_error_file(), Redirection::RTYPE::err, ps);
+        executable(ps);
       }
 
-      cmd->execute(ps);
-      continue;
-      //  return 0;
+      else
+      {
+        std::cout << input << ": command not found" << std::endl;
+      }
     }
 
-    if (executable())
-    {
-      executable(ps);
-    }
-
-    else
-    {
-      std::cout << input << ": command not found" << std::endl;
-    }
+    free(line);
   }
+
+  // while (true)
+  // {
+
+  //   // Flush after every std::cout / std:cerr
+  //   std::cout << std::unitbuf;
+  //   std::cerr << std::unitbuf;
+
+  //   // TODO: Uncomment the code below to pass the first stage
+  //   std::cout << "$ ";
+
+  //   // * Handle Invalid command
+
+  //   std::string input;
+
+  //   // std::cin >> input;
+  //   // std::cerr << input << ": command not found" << std::endl;
+  //   std::getline(std::cin, input);
+
+  //   Parser ps(input);
+
+  //   std::string command = ps.get_command();
+
+  //   Executable executable(command);
+
+  //   auto &builtcmd = Builtin<Parser>::getMap();
+
+  //   // std::string l_trim_command = l_trim(input);
+
+  //   if (builtcmd.count(command))
+  //   {
+  //     //  if(builtcmd[command]->execute(ps) != 1) break;
+
+  //     std::unique_ptr<Redirection> out_redirect;
+  //     std::unique_ptr<Redirection> err_redirect;
+
+  //     auto &cmd = builtcmd[command];
+  //     if (cmd->get_name() == "exit")
+  //       break;
+
+  //     if (ps.has_output_redirect())
+  //     {
+  //       out_redirect = std::make_unique<Redirection>(ps.get_output_file(), Redirection::RTYPE::out, ps);
+  //     }
+
+  //     if (ps.has_error_redirect())
+  //     {
+  //       err_redirect = std::make_unique<Redirection>(ps.get_error_file(), Redirection::RTYPE::err, ps);
+  //     }
+
+  //     cmd->execute(ps);
+  //     continue;
+  //     //  return 0;
+  //   }
+
+  //   if (executable())
+  //   {
+  //     executable(ps);
+  //   }
+
+  //   else
+  //   {
+  //     std::cout << input << ": command not found" << std::endl;
+  //   }
+  // }
 }
