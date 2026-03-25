@@ -57,7 +57,7 @@ int main()
 
       Parser ps(input);
 
-      std::string command = ps.get_command();
+      std::string command = ps.get_command()[0];
 
       Executable executable(command);
 

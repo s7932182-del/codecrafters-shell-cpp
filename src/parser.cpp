@@ -88,6 +88,12 @@ Parser::Parser(const std::string input)
 
                 st++;
             }
+            else if(input[st] == '|') {
+                this->argv_for_mult_cmd.push_back(this->argv);
+                this->argv.clear();
+                is_command = false;
+                st++;
+            }
             else
             {
                 if (!isspace(input[st]))
@@ -96,12 +102,12 @@ Parser::Parser(const std::string input)
             }
         }
 
-        if (!is_command)
+        if (!is_command && !argument.empty())
         {
-            this->command = argument;
-            is_command = false;
+            this->command.push_back(argument);
+            is_command = true;
         }
-        is_command = true;
+        
         if (!argument.empty())
         {
             if (this->has_output_redirect())
@@ -121,12 +127,12 @@ Parser::Parser(const std::string input)
     }
 }
 
-std::string Parser::get_command()
+std::vector<std::string> Parser::get_command()
 {
-    return this->command;
+    return  this->command;
 }
 
-std::vector<std::string> &Parser::get_argv()
+std::vector<std::string> Parser::get_argv()
 {
     return this->argv;
 }
@@ -162,4 +168,9 @@ std::string Parser::get_error_file() const
 
 bool Parser::is_append_mode() const {
     return this->has_append_mode;
+}
+
+
+std::vector<std::vector<std::string>> Parser::get_argv_for_mult_cmd() const {
+  return  this->argv_for_mult_cmd;
 }
