@@ -267,7 +267,7 @@ void CommandExecutor::execute(Parser &ps)
         }
 
 
-        Restore original stdin/stdout
+        // Restore original stdin/stdout
         dup2(original_stdin, STDIN_FILENO);
         dup2(original_stdout, STDOUT_FILENO);
         close(original_stdin);
