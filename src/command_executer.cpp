@@ -212,8 +212,8 @@ void CommandExecutor::execute(Parser &ps)
                 {
                     auto builtin_cmd = Builtin<Parser>::getMap()[current_cmd.cmd];
                     builtin_cmd->execute(current_cmd.argv);
-                    // fflush(stdout);
-                    // fflush(stderr);
+                    fflush(stdout);
+                    fflush(stderr);
                     exit(0);  // Important: Exit child after built-in execution
                 }
                 else
@@ -267,10 +267,10 @@ void CommandExecutor::execute(Parser &ps)
         }
 
 
-        // Restore original stdin/stdout
-        // dup2(original_stdin, STDIN_FILENO);
-        // dup2(original_stdout, STDOUT_FILENO);
-        // close(original_stdin);
-        // close(original_stdout);
+        Restore original stdin/stdout
+        dup2(original_stdin, STDIN_FILENO);
+        dup2(original_stdout, STDOUT_FILENO);
+        close(original_stdin);
+        close(original_stdout);
     }
 }
