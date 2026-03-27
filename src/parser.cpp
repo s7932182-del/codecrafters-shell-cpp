@@ -18,6 +18,7 @@ Parser::Parser(const std::string input)
     this->is_new_cmd = true;
     Cmd current_cmd;
     this->is_new_cmd = true;
+    isExit =false;
 
     while (st <= end)
     {
@@ -125,7 +126,10 @@ Parser::Parser(const std::string input)
 
             // Check for builtin commmand
 
-            if(argument == "exit") break;
+            if(argument == "exit") {
+                this->isExit = true;
+                break;
+            }
 
             auto builtin_cmd = Builtin<Parser>::getMap();
 

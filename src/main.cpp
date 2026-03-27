@@ -58,7 +58,7 @@ int main()
 
       Parser ps(input);
 
-
+      if(ps.get_is_exit()) break;
       if(ps.get_valid_cmd()) {
          CommandExecutor::execute(ps);
       }
