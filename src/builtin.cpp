@@ -1,5 +1,5 @@
 #include "builtin.hpp"
-#include<filesystem>
+#include <filesystem>
 #include "parser.hpp"
 
 namespace fs = std::filesystem;
@@ -13,35 +13,27 @@ TYPE &TYPE::getInstance()
     return instance;
 }
 
-void TYPE::execute(Parser &ps)
+void TYPE::execute(const std::vector<std::string> &args)
 {
-    auto cmd_queue = ps.get_cmd_args_queue();
-     
-     if(cmd_queue.empty()) {
-         std::cerr << "Queue is empty call form TYPE::execute" << std::endl;
-     }
 
-       std::string cmd = cmd_queue.front().argv[1];
+    auto &builtinMap = Builtin::getMap();
+    auto arg = args[1];
 
-    Executable exe(cmd);
-    auto& builtinMap = Builtin::getMap();
-
-    if  (builtinMap.count(cmd))
+    if (builtinMap.count(arg))
     {
-        std::cout << cmd << " is a shell builtin" << std::endl;
+        std::cout << arg << " is a shell builtin" << std::endl;
+        return;
     }
-    else if (exe())
+
+    Executable exe(arg);
+    if (exe())
     {
-        std::cout << cmd << " is " << exe.get_path() << std::endl;
+        std::cout << arg << " is " << exe.get_path() << std::endl;
     }
     else
     {
-        std::cout << cmd << ": not found" << std::endl;
+        std::cout << arg << ": not found" << std::endl;
     }
-
-    cmd_queue.pop();
-
-    // return 1;
 }
 
 std::string TYPE::get_name()
@@ -58,25 +50,19 @@ ECHO &ECHO::getInstance()
     return instance;
 }
 
-void ECHO::execute(Parser &ps)
+void ECHO::execute(const std::vector<std::string> &args)
 {
 
-    auto cmd_queue = ps.get_cmd_args_queue();
-     
-     if(cmd_queue.empty()) {
-         std::cerr << "Queue is empty call form ECHO::execute" << std::endl;
-     }
+ 
 
-     auto argv = cmd_queue.front().argv;
-     cmd_queue.pop();
+  
 
-     for (size_t i = 1; i < argv.size(); i++)
+    for (size_t i = 1; i < args.size(); i++)
     {
-        std::cout << argv[i] << " ";
+        std::cout << args[i] << " ";
     }
     std::cout << std::endl;
 
-    
     // return 1;
 }
 
@@ -94,10 +80,10 @@ EXIT &EXIT::getInstance()
     return instance;
 }
 
-void EXIT::execute(Parser& ps)
+void EXIT::execute(const std::vector<std::string> &)
 {
 
-    ps.get_cmd_args_queue().pop();
+    // ps.get_cmd_args_queue().pop();
     // return 0;
 }
 
@@ -106,74 +92,72 @@ std::string EXIT::get_name()
     return this->name;
 }
 
-
-
 //  PWD class Implementation
 
+PWD::PWD() : Builtin("pwd") {};
 
-PWD::PWD(): Builtin("pwd"){};
-
-std::string PWD::get_name()  {
-   return this->name;
+std::string PWD::get_name()
+{
+    return this->name;
 }
 
-PWD& PWD::getInstance() {
+PWD &PWD::getInstance()
+{
     static PWD instance;
     return instance;
 }
 
-
-void PWD::execute(Parser& ps) {
-     ps.get_cmd_args_queue().pop();
-   std::string cwd  = fs::current_path();
-   std::cout << cwd << std::endl;
+void PWD::execute(const std::vector<std::string>& )
+{
+    // ps.get_cmd_args_queue().pop();
+    std::string cwd = fs::current_path();
+    std::cout << cwd << std::endl;
 }
-
-
 
 //  CD Class Implementation
 
-CD::CD(): Builtin("cd"){};
+CD::CD() : Builtin("cd") {};
 
-CD& CD::getInstance(){
-     static CD instance;
-     return instance;
+CD &CD::getInstance()
+{
+    static CD instance;
+    return instance;
 }
 
-void CD::execute(Parser& ps) {
+void CD::execute(const std::vector<std::string> &args)
+{
     // std::string dir = ps.get_argv()[1];
-     auto cmd_queue = ps.get_cmd_args_queue();
-     
-     if(cmd_queue.empty()) {
-         std::cerr << "Queue is empty call form CD::execute" << std::endl;
-     }
+   
 
-     std::string dir = cmd_queue.front().argv[1];
-     cmd_queue.pop();
-    if(dir=="~")  {
-       const  char * home = getenv("HOME");
-       dir = home;
+    std::string dir = args[1];
+    if (dir == "~")
+    {
+        const char *home = getenv("HOME");
+        dir = home;
     }
-    try {
+    try
+    {
 
         fs::current_path(dir);
-    }catch(const fs::filesystem_error& e) {
+    }
+    catch (const fs::filesystem_error &e)
+    {
 
         // std::cerr << "  What: " << e.what() << "\n";
         // std::cerr << "  Path1: " << e.path1() << "\n";
 
-        if(e.code() == std::errc::no_such_file_or_directory) {
-             std::cerr << "cd: " << dir <<  ": No such file or directory" << std::endl;
-        }else if (e.code() == std::errc::permission_denied) {
+        if (e.code() == std::errc::no_such_file_or_directory)
+        {
+            std::cerr << "cd: " << dir << ": No such file or directory" << std::endl;
+        }
+        else if (e.code() == std::errc::permission_denied)
+        {
             std::cerr << "  Reason: Permission denied\n";
         }
     }
-
-
 }
 
-
-std::string CD::get_name() {
-     return this->name;
+std::string CD::get_name()
+{
+    return this->name;
 }
-

@@ -61,7 +61,7 @@ void CommandExecutor::execute(Parser &ps)
             }
 
             auto builtin_cmd = Builtin<Parser>::getMap()[current_cmd.cmd];
-            builtin_cmd->execute(ps);
+            builtin_cmd->execute(current_cmd.argv);
 
             // Restore original file descriptors
             if (saved_stdout != -1)
@@ -120,6 +120,8 @@ void CommandExecutor::execute(Parser &ps)
     else
     {
 
+        //     For multiple pipeline
+
         int fd[2];
 
         int prev_pipe_read_end = 0;
@@ -129,7 +131,7 @@ void CommandExecutor::execute(Parser &ps)
         int original_stdout = dup(STDOUT_FILENO);
         // Flag to determine if we need to fork built-ins in pipeline
         // Since we have multiple commands, we should fork ALL commands
-         bool is_pipeline = (cmd_queue.size() > 0);
+        //  bool is_pipeline = (cmd_queue.size() > 0);
 
         /*
 
@@ -156,81 +158,103 @@ void CommandExecutor::execute(Parser &ps)
                 }
             }
 
-            if (current_cmd.is_builtin)
-            {
-
+           
+              // For pipelines, we fork for ALL commands (including built-ins)
+            // This is simpler and more reliable
+            pid_t pid = fork();
+        
+            if(pid == 0) {
+                // Setup input from previous pipe
                 if (prev_pipe_read_end != 0)
                 {
                     dup2(prev_pipe_read_end, STDIN_FILENO);
                     close(prev_pipe_read_end);
-                    prev_pipe_read_end = 0;
                 }
 
+              
+                 // Setup output to next pipe (if not last)
                 if (!is_last)
                 {
-                    // close(fd[0]);
-                    dup2(fd[1], STDOUT_FILENO); // Writes in pipe of an parent process
-                    prev_pipe_read_end = fd[0]; // store the read end for the next command in parent processs
-                    close(fd[1]);
+                    close(fd[0]);  // Close read end in child
+                    dup2(fd[1], STDOUT_FILENO);
+                    close(fd[1]);  // Close write end after dup2
                 }
 
-                auto builtin_cmd = Builtin<Parser>::getMap()[current_cmd.cmd];
-                builtin_cmd->execute(ps);
-
-                dup2(original_stdin, STDIN_FILENO);
-                dup2(original_stdout, STDOUT_FILENO);
-            }
-            else
-            {
-
-                pid_t pid = fork();
-
-                if (pid == 0)
+                // Handle redirections for the pipeline
+                // Only apply output redirection to the last command
+                if (is_last && ps.has_output_redirect())
                 {
-
-                    if (prev_pipe_read_end != 0)
+                    int out_fd = open(ps.get_output_file().c_str(),
+                                     O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC),
+                                     0777);
+                    if (out_fd != -1)
                     {
-                        dup2(prev_pipe_read_end, STDIN_FILENO); // Here pipe_read_end(where type ouptut exist) pipe  to stdin of child process(grep)
-                        close(prev_pipe_read_end);              // close the prev read end  of the pipe  in child processs(grep)
+                        dup2(out_fd, STDOUT_FILENO);
+                        close(out_fd);
                     }
+                }
 
-                    if (!is_last)
+                // Apply error redirection to all commands in pipeline
+                if (ps.has_error_redirect())
+                {
+                    int err_fd = open(ps.get_error_file().c_str(),
+                                     O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC),
+                                     0777);
+                    if (err_fd != -1)
                     {
-                        close(fd[0]);               // close the  current pipe(created in 2nd iteration) read end  for the child process grep
-                        dup2(fd[1], STDOUT_FILENO); // wite the output of the (grep) in fd[1]
-                        close(fd[1]);               // close the  curret pipe read end for grep
+                        dup2(err_fd, STDERR_FILENO);
+                        close(err_fd);
                     }
+                }
 
-                    execvp(current_cmd.cmd.c_str(), exec_vector(current_cmd.argv).data());
+
+                 if (current_cmd.is_builtin)
+                {
+                    auto builtin_cmd = Builtin<Parser>::getMap()[current_cmd.cmd];
+                    builtin_cmd->execute(current_cmd.argv);
+                    fflush(stdout);
+                    fflush(stderr);
+                    exit(0);  // Important: Exit child after built-in execution
                 }
                 else
                 {
+                    execvp(current_cmd.cmd.c_str(), exec_vector(current_cmd.argv).data());
+                    perror("execvp");
+                    exit(1);
+                }
 
-                    child_pids.push_back(pid);
-                    //  Again in parent processs
+            } else if(pid > 0) {
+                child_pids.push_back(pid);
+                
+                // Close previous pipe read end in parent
+                if (prev_pipe_read_end != 0)
+                {
+                    close(prev_pipe_read_end);
+                }
 
-                    // If now child process is completed  and now again parent porcess
 
+                  // Setup for next command
+                if (!is_last)
+                {
+                    close(fd[1]);  // Close write end in parent
+                    prev_pipe_read_end = fd[0];  // Save read end for next command
+                }
+                else
+                {
+                    // Last command - close any remaining pipe read end
                     if (prev_pipe_read_end != 0)
                     {
-                        close(prev_pipe_read_end); // clsoe the read_end of pipe that is opened by  "thpe pwd" command
-                    }
-
-                    if (!is_last)
-                    {
-                        close(fd[1]);               // Close write end; of pipe created on the second iterations
-                        prev_pipe_read_end = fd[0]; // Save read end for this pipe  for the next commadn
-                    }
-                    else
-                    {
-                        if (prev_pipe_read_end != 0)
-                        {
-                            close(prev_pipe_read_end);
-                            prev_pipe_read_end = 0;
-                        }
+                        close(prev_pipe_read_end);
+                        prev_pipe_read_end = 0;
                     }
                 }
+            } else {
+                perror("fork");
+                exit(1);
             }
+        
+
+        
         }
 
         

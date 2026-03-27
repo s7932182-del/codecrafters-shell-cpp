@@ -29,6 +29,7 @@ private:
     bool has_append_mode;
     bool is_new_cmd;
     bool is_valid_cmd;
+    bool isExit;
     
     public:
     Parser(const std::string input);
@@ -43,6 +44,7 @@ private:
     // std::vector<std::vector<std::string>> get_argv_for_mult_cmd() const;
     std::queue<Cmd> get_cmd_args_queue() const;
     bool get_valid_cmd() const;
+    bool get_is_exit() const;
 };
 
 #endif

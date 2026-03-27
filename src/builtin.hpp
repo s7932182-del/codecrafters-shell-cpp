@@ -18,7 +18,7 @@ public:
     Builtin(const std::string &n = "") : name(n) {
        
     }
-    virtual void execute(T&) = 0;
+    virtual void execute(const std::vector<std::string>& args) = 0;
     virtual std::string get_name() = 0;
     virtual ~Builtin() = default;
 
@@ -43,7 +43,7 @@ private:
 
 public:
     static TYPE &getInstance();
-    void execute(Parser &ps) override;
+    void execute(const std::vector<std::string>& args) override;
     std::string get_name() override;
 };
 
@@ -58,7 +58,7 @@ private:
 
 public:
     static ECHO &getInstance();
-    void execute(Parser &ps) override;
+    void execute(const std::vector<std::string>& args) override;
     std::string get_name() override;
 };
 
@@ -73,7 +73,7 @@ private:
 
 public:
     static EXIT &getInstance();
-    void execute(Parser& x) override;
+    void execute(const std::vector<std::string>& args) override;
     std::string get_name() override;
 };
 
@@ -91,7 +91,7 @@ private:
 
 public:
     static PWD &getInstance();
-    void execute(Parser& x) override;
+    void execute(const std::vector<std::string>& args) override;
     
     std::string get_name() override;
 };
@@ -108,7 +108,7 @@ private:
 
 public:
     static CD &getInstance();
-    void execute(Parser& x) override;
+    void execute(const std::vector<std::string>& args) override;
     std::string get_name() override;
 };
 

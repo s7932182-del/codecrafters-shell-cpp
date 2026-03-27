@@ -125,6 +125,8 @@ Parser::Parser(const std::string input)
 
             // Check for builtin commmand
 
+            if(argument == "exit") break;
+
             auto builtin_cmd = Builtin<Parser>::getMap();
 
             if (builtin_cmd.count(argument))
@@ -161,6 +163,7 @@ Parser::Parser(const std::string input)
             }
             else
             {
+
                 // this->argv.push_back(argument);
                 current_cmd.argv.push_back(argument);
             }
@@ -204,6 +207,12 @@ bool Parser::is_append_mode() const
 bool Parser::get_valid_cmd() const
 {
     return this->is_valid_cmd;
+}
+
+
+bool Parser::get_is_exit() const
+{
+    return this->isExit;
 }
 
 std::queue<Parser::Cmd> Parser::get_cmd_args_queue() const
