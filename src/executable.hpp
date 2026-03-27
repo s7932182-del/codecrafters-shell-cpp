@@ -17,6 +17,7 @@ private:
     std::string exe;
     bool is_exe = false;
     std::string exe_path = "";
+   
 
 public:
     Executable(std::string command);

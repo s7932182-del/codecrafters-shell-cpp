@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include "function.hpp"
 #include <algorithm>
+#include "parser.hpp"
 
 Executable::Executable(std::string command) : exe(command)
 {
@@ -35,129 +36,108 @@ bool Executable::operator()()
     return this->is_exe;
 }
 
-void Executable::operator()(Parser &ps)
-{
-    int total_cmd = ps.get_command().size();
-    std::vector<std::string> argv_strings = total_cmd > 1 ? ps.get_argv_for_mult_cmd()[0] : ps.get_argv();
-    std::vector<char *> argv;
 
-    for (auto &s : argv_strings)
-    {
-        argv.push_back(s.data()); // C++17 gives non-const pointer
-    }
-    argv.push_back(nullptr);
 
-    int fd[2];
+// void Executable::operator()(Parser &ps)
+// {
+//     auto cmd_queue = ps.get_cmd_args_queue();
+//     // std::vector<std::string> argv_strings = total_cmd > 1 ? ps.get_argv_for_mult_cmd()[0] : ps.get_argv();
+  
 
-    if (total_cmd > 1)
-    {
-        pipe(fd);
-    }
+//     int prev_pipe_read = 0; //? Initially STDIN_FILENO
+//     int fd[2];              // ? fd[0] for read end & fd[1] for write end
 
-    pid_t pid = fork();
+//     while (!cmd_queue.empty())
+//     {
+//         auto current_cmd = cmd_queue.front();
+//         cmd_queue.pop();
+//         bool is_last = cmd_queue.empty();
+//         if (!is_last)
+//         {
+//             if (pipe(fd) == -1)
+//             {
+//                 perror("pipe");
+//                 exit(1);
+//             }
+//         }
 
-    if (pid == 0)
-    {
+//         pid_t pid = fork();
 
-        // / Use Redirection class in child process
+//         if (pid == 0)
+//         {
+//             // Child process
+//             //  * If previos cmd send any output via pipe then read the ouput
+//             if (prev_pipe_read != 0)
+//             {
+//                 dup2(prev_pipe_read, STDIN_FILENO);
+//                 close(prev_pipe_read); // close for the child process
+//             }
 
-        if (ps.has_output_redirect())
-        {
-            // Create redirection object - this will redirect cout in the child
+//             if (!is_last)
+//             {
+//                 close(fd[0]);
+//                 dup2(fd[1], STDOUT_FILENO); // ** Write the output in pipe  current pipe write end not to the stdout
+//                 close(fd[1]);
+//             }
+           
 
-            int output_file;
+//         //    // Print debug information
+//         //     std::cout << "=== Child Process " << getpid() << " ===" << std::endl;
+//         //     std::cout << "Command: " << current_cmd.cmd << std::endl;
+//         //     std::cout << "Arguments: ";
+//         //     for (auto x : current_cmd.argv) {
+//         //         std::cout << x << " ";
+//         //     }
+//         //     std::cout << std::endl;
+            
+//         //     // Build argument vector
+//         //     std::vector<char*> v = exec_vector(current_cmd.cmd, current_cmd.argv);
+            
+//         //     std::cout << "Arg vector: ";
+//         //     for (size_t i = 0; v[i] != nullptr; i++) {
+//         //         std::cout << v[i] << " ";
+//         //     }
+//         //     std::cout << "(null terminated)" << std::endl;
+            
+//         //     std::cout << "Pipe setup: " << std::endl;
+//         //     std::cout << "  prev_pipe_read: " << prev_pipe_read << std::endl;
+//         //     std::cout << "  is_last: " << (is_last ? "true" : "false") << std::endl;
+//         //     if (!is_last) {
+//         //         std::cout << "  fd[0] (read end): " << fd[0] << std::endl;
+//         //         std::cout << "  fd[1] (write end): " << fd[1] << std::endl;
+//         //     }
+            
+//         //     std::cout << "=========================" << std::endl;
+//         //     std::cout.flush();  // Force flush output
+            
+//         //     // IMPORTANT: Exit child process after printing
+//         //     // Don't call execvp() - just exit
+//         //     exit(0);
+            
 
-            if (ps.is_append_mode())
-            {
-                output_file = open(ps.get_output_file().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0777);
-            }
-            else
-            {
 
-                output_file = open(ps.get_output_file().c_str(), O_WRONLY | O_CREAT, 0777);
-            }
+//             execvp(current_cmd.cmd.c_str(), exec_vector(current_cmd.cmd, current_cmd.argv).data());
+//         }
+//         else
+//         {
+//             // parent process
 
-            dup2(output_file, STDOUT_FILENO);
+//             //  *  close the read end the previos pipe if exist
 
-            close(output_file);
-        }
+//             if (prev_pipe_read != 0)
+//             {
+//                 close(prev_pipe_read);
+//             }
 
-        if (ps.has_error_redirect())
-        {
-            int error_file;
-
-            if (ps.is_append_mode())
-            {
-                error_file = open(ps.get_error_file().c_str(), O_WRONLY | O_CREAT | O_APPEND, 0777);
-            }
-            else
-            {
-
-                error_file = open(ps.get_error_file().c_str(), O_WRONLY | O_CREAT, 0777);
-            }
-            dup2(error_file, STDERR_FILENO);
-            close(error_file);
-        }
-
-        // Execute the command
-
-        if (total_cmd > 1)
-        {
-            close(fd[0]);
-            dup2(fd[1], STDOUT_FILENO);
-            close(fd[1]);
-        }
-
-        if (execv(this->exe_path.c_str(), argv.data()) == -1)
-        {
-            std::cerr << "Error occurred while exec" << std::endl;
-            exit(1);
-        }
-    }
-
-    pid_t pid2;
-
-    if (total_cmd > 1)
-    {
-        std::string cmd = ps.get_command()[1];
-
-        auto args_for_this_cmd = ps.get_argv();
-        std::vector<char *> argv_for_this_cmd;
-
-        if (!args_for_this_cmd.empty())
-        {
-
-            for (auto &s : args_for_this_cmd)
-            {
-                argv_for_this_cmd.push_back(s.data()); // C++17 gives non-const pointer
-            }
-            argv_for_this_cmd.push_back(nullptr);
-        }
-
-        pid2 = fork();
-
-        if(pid2 == 0) {
-
-            close(fd[1]);
+//             if (!is_last)
+//             {
+//                 close(fd[1]);
+//                 prev_pipe_read = fd[0];
+//             }
+//         }
+//     }
     
-            dup2(fd[0], STDIN_FILENO);
-            close(fd[0]);
-    
-            execvp(cmd.c_str(), argv_for_this_cmd.data());
-        }
+//     while(wait(nullptr) > 0);
 
-
-        //  pid2 = fork();
-    }
-
-    if (total_cmd > 1)
-    {
-        close(fd[0]);
-        close(fd[1]);
-    }
-
-    // std::cout << "Parent is running " << std::endl;
-
-    waitpid(pid, NULL,0);
-    waitpid(pid2, NULL, 0);
-}
+  
+// }

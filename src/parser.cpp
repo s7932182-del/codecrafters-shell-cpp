@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include "redirection.hpp"
+#include "builtin.hpp"
 #include <string>
 
 Parser::Parser(const std::string input)
@@ -14,12 +15,16 @@ Parser::Parser(const std::string input)
     this->has_output_redirection = false;
     this->has_error_redirection = false;
     this->has_append_mode = false;
+    this->is_new_cmd = true;
+    Cmd current_cmd;
+    this->is_new_cmd = true;
 
     while (st <= end)
     {
         while (isspace(input[st]) && st <= end)
             st++;
         std::string argument;
+
         while (!isspace(input[st]) && st <= end)
         {
 
@@ -88,11 +93,21 @@ Parser::Parser(const std::string input)
 
                 st++;
             }
-            else if(input[st] == '|') {
-                this->argv_for_mult_cmd.push_back(this->argv);
-                this->argv.clear();
-                is_command = false;
+            else if (input[st] == '|')
+            {
+                // this->argv_for_mult_cmd.push_back(this->argv);
+                // this->argv.clear();
+                // is_command = false;
                 st++;
+
+                if (!current_cmd.cmd.empty() || !current_cmd.argv.empty())
+                {
+                    q.push(current_cmd);
+                }
+                current_cmd = Cmd();
+                is_command = false;
+
+                break;
             }
             else
             {
@@ -104,10 +119,36 @@ Parser::Parser(const std::string input)
 
         if (!is_command && !argument.empty())
         {
-            this->command.push_back(argument);
+
+            // cmd.cmd = argument;
+            // this->command.push_back(argument);
+
+            // Check for builtin commmand
+
+            auto builtin_cmd = Builtin<Parser>::getMap();
+
+            if (builtin_cmd.count(argument))
+                current_cmd.is_builtin = true;
+
+            //  Check for executable
+            else
+            {
+                Executable exe(argument);
+
+                if (exe())
+                    current_cmd.is_builtin = false;
+                else
+                {
+                    this->is_valid_cmd = false;
+                    std::cout << input << ": command not found" << std::endl;
+                    break;
+                }
+            }
+
+            current_cmd.cmd = argument;
             is_command = true;
         }
-        
+
         if (!argument.empty())
         {
             if (this->has_output_redirect())
@@ -120,30 +161,18 @@ Parser::Parser(const std::string input)
             }
             else
             {
-                this->argv.push_back(argument);
+                // this->argv.push_back(argument);
+                current_cmd.argv.push_back(argument);
             }
         }
         // st++;
     }
-}
 
-std::vector<std::string> Parser::get_command()
-{
-    return  this->command;
-}
-
-std::vector<std::string> Parser::get_argv()
-{
-    return this->argv;
-}
-
-void Parser::print_arg()
-{
-    for (size_t i = 1; i < this->argv.size(); i++)
+    // Push the last command if it exists
+    if (!current_cmd.cmd.empty() || !current_cmd.argv.empty())
     {
-        std::cout << argv[i] << " ";
+        q.push(current_cmd);
     }
-    std::cout << std::endl;
 }
 
 std::string Parser::get_output_file() const
@@ -166,11 +195,18 @@ std::string Parser::get_error_file() const
     return this->error_file;
 }
 
-bool Parser::is_append_mode() const {
+bool Parser::is_append_mode() const
+{
     return this->has_append_mode;
 }
 
 
-std::vector<std::vector<std::string>> Parser::get_argv_for_mult_cmd() const {
-  return  this->argv_for_mult_cmd;
+bool Parser::get_valid_cmd() const
+{
+    return this->is_valid_cmd;
+}
+
+std::queue<Parser::Cmd> Parser::get_cmd_args_queue() const
+{
+    return this->q;
 }

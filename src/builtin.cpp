@@ -15,7 +15,14 @@ TYPE &TYPE::getInstance()
 
 void TYPE::execute(Parser &ps)
 {
-    std::string cmd = ps.get_argv()[1];
+    auto cmd_queue = ps.get_cmd_args_queue();
+     
+     if(cmd_queue.empty()) {
+         std::cerr << "Queue is empty call form TYPE::execute" << std::endl;
+     }
+
+       std::string cmd = cmd_queue.front().argv[1];
+
     Executable exe(cmd);
     auto& builtinMap = Builtin::getMap();
 
@@ -31,6 +38,8 @@ void TYPE::execute(Parser &ps)
     {
         std::cout << cmd << ": not found" << std::endl;
     }
+
+    cmd_queue.pop();
 
     // return 1;
 }
@@ -51,7 +60,23 @@ ECHO &ECHO::getInstance()
 
 void ECHO::execute(Parser &ps)
 {
-    ps.print_arg();
+
+    auto cmd_queue = ps.get_cmd_args_queue();
+     
+     if(cmd_queue.empty()) {
+         std::cerr << "Queue is empty call form ECHO::execute" << std::endl;
+     }
+
+     auto argv = cmd_queue.front().argv;
+     cmd_queue.pop();
+
+     for (size_t i = 1; i < argv.size(); i++)
+    {
+        std::cout << argv[i] << " ";
+    }
+    std::cout << std::endl;
+
+    
     // return 1;
 }
 
@@ -69,8 +94,10 @@ EXIT &EXIT::getInstance()
     return instance;
 }
 
-void EXIT::execute(Parser&)
+void EXIT::execute(Parser& ps)
 {
+
+    ps.get_cmd_args_queue().pop();
     // return 0;
 }
 
@@ -96,7 +123,8 @@ PWD& PWD::getInstance() {
 }
 
 
-void PWD::execute(Parser&) {
+void PWD::execute(Parser& ps) {
+     ps.get_cmd_args_queue().pop();
    std::string cwd  = fs::current_path();
    std::cout << cwd << std::endl;
 }
@@ -113,7 +141,15 @@ CD& CD::getInstance(){
 }
 
 void CD::execute(Parser& ps) {
-    std::string dir = ps.get_argv()[1];
+    // std::string dir = ps.get_argv()[1];
+     auto cmd_queue = ps.get_cmd_args_queue();
+     
+     if(cmd_queue.empty()) {
+         std::cerr << "Queue is empty call form CD::execute" << std::endl;
+     }
+
+     std::string dir = cmd_queue.front().argv[1];
+     cmd_queue.pop();
     if(dir=="~")  {
        const  char * home = getenv("HOME");
        dir = home;
