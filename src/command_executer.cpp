@@ -182,30 +182,30 @@ void CommandExecutor::execute(Parser &ps)
 
                 // Handle redirections for the pipeline
                 // Only apply output redirection to the last command
-                if (is_last && ps.has_output_redirect())
-                {
-                    int out_fd = open(ps.get_output_file().c_str(),
-                                     O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC),
-                                     0777);
-                    if (out_fd != -1)
-                    {
-                        dup2(out_fd, STDOUT_FILENO);
-                        close(out_fd);
-                    }
-                }
+                // if (is_last && ps.has_output_redirect())
+                // {
+                //     int out_fd = open(ps.get_output_file().c_str(),
+                //                      O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC),
+                //                      0777);
+                //     if (out_fd != -1)
+                //     {
+                //         dup2(out_fd, STDOUT_FILENO);
+                //         close(out_fd);
+                //     }
+                // }
 
                 // Apply error redirection to all commands in pipeline
-                if (ps.has_error_redirect())
-                {
-                    int err_fd = open(ps.get_error_file().c_str(),
-                                     O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC),
-                                     0777);
-                    if (err_fd != -1)
-                    {
-                        dup2(err_fd, STDERR_FILENO);
-                        close(err_fd);
-                    }
-                }
+                // if (ps.has_error_redirect())
+                // {
+                //     int err_fd = open(ps.get_error_file().c_str(),
+                //                      O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC),
+                //                      0777);
+                //     if (err_fd != -1)
+                //     {
+                //         dup2(err_fd, STDERR_FILENO);
+                //         close(err_fd);
+                //     }
+                // }
 
 
                  if (current_cmd.is_builtin)
