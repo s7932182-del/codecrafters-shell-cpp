@@ -53,14 +53,15 @@ ECHO &ECHO::getInstance()
 void ECHO::execute(const std::vector<std::string> &args)
 
 {
+
+    size_t i = 1;
  
-    for (size_t i = 1; i < args.size(); i++)
+    for ( i = 1; i < args.size() -1; i++)
     {  
-        if(args.size() == 2)
-        std::cout << args[i];
-        else 
         std::cout << args[i] << " ";
     }
+
+    std::cout << args[i];
     std::cout << std::endl;
 
     // return 1;
