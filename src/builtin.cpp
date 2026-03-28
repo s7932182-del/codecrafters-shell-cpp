@@ -55,10 +55,13 @@ void ECHO::execute(const std::vector<std::string> &args)
 {
  
     for (size_t i = 1; i < args.size(); i++)
-    {
-         printf("%s ",args[i].data());
+    {  
+        if(args.size() == 2)
+        std::cout << args[i];
+        else 
+        std::cout << args[i] << " ";
     }
-    printf("\n");
+    std::cout << std::endl;
 
     // return 1;
 }
