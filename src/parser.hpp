@@ -14,14 +14,16 @@ private:
     // std::vector<std::string> argv;
     
 
-    
-    struct Cmd
+     struct Cmd
     {
         std::string cmd;
         std::vector<std::string> argv;
         bool is_builtin;
     };
-    std::queue<Cmd> q;
+
+     std::queue<Cmd> q;
+    
+   
     std::string output_file;
     std::string error_file;
     bool has_output_redirection;
@@ -35,6 +37,8 @@ private:
     Parser(const std::string input);
     // std::vector<std::string> get_command();
     // std::vector<std::string> get_argv();
+
+   
 
     std::string get_output_file() const;
     std::string get_error_file() const;

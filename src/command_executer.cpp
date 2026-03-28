@@ -153,7 +153,7 @@ void CommandExecutor::execute(Parser &ps)
             {
                 if (pipe(fd) == -1)
                 {
-                    perror("pipe");
+                    std::cerr << "Pipe Errror " << std::endl ;
                     exit(1);
                 }
             }
@@ -219,7 +219,7 @@ void CommandExecutor::execute(Parser &ps)
                 else
                 {
                     execvp(current_cmd.cmd.c_str(), exec_vector(current_cmd.argv).data());
-                    perror("execvp");
+                     std::cerr << "Error in execvp" << std::endl;
                     exit(1);
                 }
 
@@ -249,7 +249,7 @@ void CommandExecutor::execute(Parser &ps)
                     }
                 }
             } else {
-                perror("fork");
+                std::cerr<< "Error in fork" << std::endl;
                 exit(1);
             }
         
