@@ -51,12 +51,9 @@ ECHO &ECHO::getInstance()
 }
 
 void ECHO::execute(const std::vector<std::string> &args)
+
 {
-
  
-
-  
-
     for (size_t i = 1; i < args.size(); i++)
     {
         std::cout << args[i] << " ";

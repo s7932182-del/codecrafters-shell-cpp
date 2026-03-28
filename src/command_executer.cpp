@@ -127,11 +127,11 @@ void CommandExecutor::execute(Parser &ps)
         int prev_pipe_read_end = 0;
         std::vector<pid_t> child_pids;
 
-        int original_stdin = dup(STDIN_FILENO);
-        int original_stdout = dup(STDOUT_FILENO);
+        // int original_stdin = dup(STDIN_FILENO);
+        // int original_stdout = dup(STDOUT_FILENO);
         // Flag to determine if we need to fork built-ins in pipeline
         // Since we have multiple commands, we should fork ALL commands
-        //  bool is_pipeline = (cmd_queue.size() > 0);
+      
 
         /*
 
@@ -244,7 +244,7 @@ void CommandExecutor::execute(Parser &ps)
                     // Last command - close any remaining pipe read end
                     if (prev_pipe_read_end != 0)
                     {
-                        close(prev_pipe_read_end);
+                        // close(prev_pipe_read_end);
                         prev_pipe_read_end = 0;
                     }
                 }
@@ -268,9 +268,9 @@ void CommandExecutor::execute(Parser &ps)
 
 
         // Restore original stdin/stdout
-        dup2(original_stdin, STDIN_FILENO);
-        dup2(original_stdout, STDOUT_FILENO);
-        close(original_stdin);
-        close(original_stdout);
+        // dup2(original_stdin, STDIN_FILENO);
+        // dup2(original_stdout, STDOUT_FILENO);
+        // close(original_stdin);
+        // close(original_stdout);
     }
 }
