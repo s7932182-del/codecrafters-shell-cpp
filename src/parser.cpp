@@ -19,6 +19,7 @@ Parser::Parser(const std::string input)
     Cmd current_cmd;
     this->is_new_cmd = true;
     isExit =false;
+    is_valid_cmd = true;
 
     while (st <= end)
     {
