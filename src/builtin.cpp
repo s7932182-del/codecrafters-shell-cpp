@@ -176,7 +176,7 @@ HISTORY &HISTORY::getInstance() {
     return instance;
 }
 
-void HISTORY::execute(const std::vector<std::string> &) {
+void HISTORY::execute(const std::vector<std::string> & args) {
 
     HIST_ENTRY** history = history_list();
     
@@ -184,9 +184,19 @@ void HISTORY::execute(const std::vector<std::string> &) {
         std::cout << "No history entries" << std::endl;
         return;
     }
-    
+
+    int total = 0;
+
+    while(history[total] != nullptr) {
+        total++;
+    }
+
+    int pos = args.size() == 2 ? std::max(0,std::stoi(args[1])) : 0;
+
+    int start = pos > 0 ? total - pos : 0;
+       
     // Iterate through history
-    for (int i = 0; history[i] != nullptr; i++) {
+    for (int i = start; history[i] != nullptr; i++) {
         std::cout <<  "     "  << i << " " << history[i]->line << std::endl;
     }
 
