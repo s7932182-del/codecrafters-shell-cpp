@@ -120,16 +120,15 @@ class HISTORY final: public Builtin<Parser>
 {
 private:
     HISTORY();
-
-public:
+    
+    public:
+    static int count;
     static HISTORY &getInstance();
     void execute(const std::vector<std::string>& args) override;
     std::string get_name() override;
 };
 
-
-
-
+int HISTORY::count = 0;
 
 
 #endif

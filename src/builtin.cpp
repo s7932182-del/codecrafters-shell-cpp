@@ -169,6 +169,8 @@ std::string CD::get_name()
 
 //  HISTORY Class Implementation
 
+
+
 HISTORY::HISTORY() : Builtin("history"){};
 
 HISTORY &HISTORY::getInstance() {
@@ -186,14 +188,9 @@ void HISTORY::execute(const std::vector<std::string> & args) {
          write_history(args[2].c_str());
          return;
     }else if(args.size() > 2 && args[1] == "-a") {
-       static int count  = history_length;
-        HIST_ENTRY** history = history_list();
+        
 
-        while(history[count] != nullptr) {
-            count++;
-        }
-
-        append_history(count,args[2].c_str());
+        append_history(count++,args[2].c_str());
         return;
 
     }
