@@ -187,7 +187,7 @@ void HISTORY::execute(const std::vector<std::string> &) {
     
     // Iterate through history
     for (int i = 0; history[i] != nullptr; i++) {
-        std::cout << i << ": " << history[i]->line << std::endl;
+        std::cout <<  "     "  << i << " " << history[i]->line << std::endl;
     }
 
 }
