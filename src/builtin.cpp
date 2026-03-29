@@ -56,9 +56,9 @@ void ECHO::execute(const std::vector<std::string> &args)
 {
 
     size_t i = 1;
- 
-    for ( i = 1; i < args.size() -1; i++)
-    {  
+
+    for (i = 1; i < args.size() - 1; i++)
+    {
         std::cout << args[i] << " ";
     }
 
@@ -109,7 +109,7 @@ PWD &PWD::getInstance()
     return instance;
 }
 
-void PWD::execute(const std::vector<std::string>& )
+void PWD::execute(const std::vector<std::string> &)
 {
     // ps.get_cmd_args_queue().pop();
     std::string cwd = fs::current_path();
@@ -129,7 +129,6 @@ CD &CD::getInstance()
 void CD::execute(const std::vector<std::string> &args)
 {
     // std::string dir = ps.get_argv()[1];
-   
 
     std::string dir = args[1];
     if (dir == "~")
@@ -164,61 +163,71 @@ std::string CD::get_name()
     return this->name;
 }
 
-
-
-
 //  HISTORY Class Implementation
 
+HISTORY::HISTORY() : Builtin("history") {};
 
-
-HISTORY::HISTORY() : Builtin("history"){};
-
-HISTORY &HISTORY::getInstance() {
+HISTORY &HISTORY::getInstance()
+{
     static HISTORY instance;
     return instance;
 }
 
-void HISTORY::execute(const std::vector<std::string> & args) {
+void HISTORY::execute(const std::vector<std::string> &args)
+{
+    static int count = 0;
 
-
-    if(args.size() > 2  &&    args[1] == "-r") {
+    if (args.size() > 2 && args[1] == "-r")
+    {
         read_history(args[2].c_str());
         return;
-    }  else if(args.size() > 2 && args[1] == "-w") {
-         write_history(args[2].c_str());
-         return;
-    }else if(args.size() > 2 && args[1] == "-a") {
-        
-
-        append_history(count++,args[2].c_str());
+    }
+    else if (args.size() > 2 && args[1] == "-w")
+    {
+        write_history(args[2].c_str());
         return;
+    }
+    else if (args.size() > 2 && args[1] == "-a")
+    {
 
+        int total = 0;
+        HIST_ENTRY **history = history_list();
+
+        while (history[total++] != nullptr)
+            ;
+        count = total - count;
+        append_history(count, args[2].c_str());
+        // count = history_length;
+        return;
     }
 
-    HIST_ENTRY** history = history_list();
-    
-    if (history == nullptr) {
+    HIST_ENTRY **history = history_list();
+
+    if (history == nullptr)
+    {
         std::cout << "No history entries" << std::endl;
         return;
     }
 
     int total = 0;
 
-    while(history[total] != nullptr) {
+    while (history[total] != nullptr)
+    {
         total++;
     }
 
-    int pos = args.size() == 2 ? std::max(0,std::stoi(args[1])) : 0;
+    int pos = args.size() == 2 ? std::max(0, std::stoi(args[1])) : 0;
 
     int start = pos > 0 ? total - pos : 0;
-       
-    // Iterate through history
-    for (int i = start; history[i] != nullptr; i++) {
-        std::cout <<  "     "  << i << " " << history[i]->line << std::endl;
-    }
 
+    // Iterate through history
+    for (int i = start; history[i] != nullptr; i++)
+    {
+        std::cout << "     " << i << " " << history[i]->line << std::endl;
+    }
 }
 
-std::string HISTORY::get_name() {
-     return this->name;
+std::string HISTORY::get_name()
+{
+    return this->name;
 }
