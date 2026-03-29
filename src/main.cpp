@@ -64,6 +64,7 @@ int main()
       Parser ps(input);
 
       if(ps.get_is_exit()) {
+        write_history(histfile);
         break;
       };
       if(ps.get_valid_cmd()) {
