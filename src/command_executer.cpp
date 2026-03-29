@@ -265,7 +265,7 @@ void CommandExecutor::execute(Parser &ps)
             int status;
             waitpid(pid, &status, 0);
 
-            std::cout << status << std::endl;
+            // std::cout << status << std::endl;
         }
 
 
