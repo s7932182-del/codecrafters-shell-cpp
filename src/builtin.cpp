@@ -178,6 +178,12 @@ HISTORY &HISTORY::getInstance() {
 
 void HISTORY::execute(const std::vector<std::string> & args) {
 
+
+    if(args.size() > 2  &&    args[1] == "-r") {
+        read_history(args[2].c_str());
+        return;
+    } 
+
     HIST_ENTRY** history = history_list();
     
     if (history == nullptr) {
