@@ -185,6 +185,17 @@ void HISTORY::execute(const std::vector<std::string> & args) {
     }  else if(args.size() > 2 && args[1] == "-w") {
          write_history(args[2].c_str());
          return;
+    }else if(args.size() > 2 && args[1] == "-a") {
+        int count  = 0;
+        HIST_ENTRY** history = history_list();
+
+        while(history[count] != nullptr) {
+            count++;
+        }
+
+        append_history(count,args[2].c_str());
+        return;
+
     }
 
     HIST_ENTRY** history = history_list();
