@@ -177,17 +177,27 @@ void HISTORY::execute(const std::vector<std::string> &args)
 {
     static int count = 0;
 
-    if (args.size() > 2 && args[1] == "-r")
+    char *histfile = getenv("HISTFILE");
+    if (args[1] == "-r")
     {
         read_history(args[2].c_str());
         return;
     }
-    else if (args.size() > 2 && args[1] == "-w")
+    else if (args[1] == "-w")
     {
-        write_history(args[2].c_str());
+        const char *file;
+        if (args.size() == 2)
+        {
+            file = histfile;
+        }
+        else
+        {
+            file = args[2].c_str();
+        }
+        write_history(file);
         return;
     }
-    else if (args.size() > 2 && args[1] == "-a")
+    else if (args[1] == "-a")
     {
 
         int total = 0;

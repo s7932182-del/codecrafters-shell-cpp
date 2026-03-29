@@ -63,7 +63,18 @@ int main()
 
       Parser ps(input);
 
-      if(ps.get_is_exit()) break;
+      if(ps.get_is_exit()) {
+         read_history(histfile);
+         HIST_ENTRY ** history = history_list();
+
+         int i  = 0;
+
+          while(history[i] != nullptr) {
+             std::cout << history[i]->line << std::endl;
+             i++;
+          }
+        break;
+      };
       if(ps.get_valid_cmd()) {
          CommandExecutor::execute(ps);
       }
