@@ -41,6 +41,10 @@ int main()
   rl_attempted_completion_function = TabCompletor::my_completion;
   rl_bind_key('\t', rl_complete);
 
+   char* histfile = getenv("HISTFILE");
+
+   read_history(histfile);
+
   std::string input;
   char *line;
 
