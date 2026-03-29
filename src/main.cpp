@@ -30,6 +30,7 @@ void registerBuiltin()
   Builtin<Parser>::register_command("exit", &EXIT::getInstance());
   Builtin<Parser>::register_command("pwd", &PWD::getInstance());
   Builtin<Parser>::register_command("cd", &CD::getInstance());
+  Builtin<Parser>::register_command("history", &HISTORY::getInstance());
 }
 
 int main()

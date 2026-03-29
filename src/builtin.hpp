@@ -113,6 +113,22 @@ public:
 };
 
 
+// ? History Builtin
+
+
+class HISTORY final: public Builtin<Parser> 
+{
+private:
+    HISTORY();
+
+public:
+    static HISTORY &getInstance();
+    void execute(const std::vector<std::string>& args) override;
+    std::string get_name() override;
+};
+
+
+
 
 
 

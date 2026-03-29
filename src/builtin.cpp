@@ -1,6 +1,7 @@
 #include "builtin.hpp"
 #include <filesystem>
 #include "parser.hpp"
+#include <readline/history.h>
 
 namespace fs = std::filesystem;
 
@@ -161,4 +162,36 @@ void CD::execute(const std::vector<std::string> &args)
 std::string CD::get_name()
 {
     return this->name;
+}
+
+
+
+
+//  HISTORY Class Implementation
+
+HISTORY::HISTORY() : Builtin("history"){};
+
+HISTORY &HISTORY::getInstance() {
+    static HISTORY instance;
+    return instance;
+}
+
+void HISTORY::execute(const std::vector<std::string> &) {
+
+    HIST_ENTRY** history = history_list();
+    
+    if (history == nullptr) {
+        std::cout << "No history entries" << std::endl;
+        return;
+    }
+    
+    // Iterate through history
+    for (int i = 0; history[i] != nullptr; i++) {
+        std::cout << i << ": " << history[i]->line << std::endl;
+    }
+
+}
+
+std::string HISTORY::get_name() {
+     return this->name;
 }
