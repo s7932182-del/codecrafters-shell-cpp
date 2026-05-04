@@ -112,7 +112,7 @@ PWD &PWD::getInstance()
 void PWD::execute(const std::vector<std::string> &)
 {
     // ps.get_cmd_args_queue().pop();
-    std::string cwd = fs::current_path();
+    const std::string cwd = fs::current_path();
     std::cout << cwd << std::endl;
 }
 
@@ -177,7 +177,7 @@ void HISTORY::execute(const std::vector<std::string> &args)
 {
     static int count = 0;
 
-    char *histfile = getenv("HISTFILE");
+    const char *histFile = getenv("HISTFILE");
     if (args[1] == "-r")
     {
         read_history(args[2].c_str());
@@ -188,7 +188,7 @@ void HISTORY::execute(const std::vector<std::string> &args)
         const char *file;
         if (args.size() == 2)
         {
-            file = histfile;
+            file = histFile;
         }
         else
         {
@@ -226,9 +226,9 @@ void HISTORY::execute(const std::vector<std::string> &args)
         total++;
     }
 
-    int pos = args.size() == 2 ? std::max(0, std::stoi(args[1])) : 0;
+    const int pos = args.size() == 2 ? std::max(0, std::stoi(args[1])) : 0;
 
-    int start = pos > 0 ? total - pos : 0;
+    const int start = pos > 0 ? total - pos : 0;
 
     // Iterate through history
     for (int i = start; history[i] != nullptr; i++)

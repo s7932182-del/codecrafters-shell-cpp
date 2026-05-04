@@ -5,9 +5,7 @@
 #include "builtin.hpp"
 #include <string>
 
-Parser::Parser(const std::string input)
-{
-
+Parser::Parser(const std::string input) {
     // std::cout << "Input: " << input << std::endl;
 
     int st = 0, end = input.length() - 1;
@@ -18,116 +16,88 @@ Parser::Parser(const std::string input)
     this->is_new_cmd = true;
     Cmd current_cmd;
     this->is_new_cmd = true;
-    isExit =false;
+    isExit = false;
     is_valid_cmd = true;
 
-    while (st <= end)
-    {
+    while (st <= end) {
         while (isspace(input[st]) && st <= end)
             st++;
         std::string argument;
 
-        while (!isspace(input[st]) && st <= end)
-        {
-
-            if (input[st] == '\'')
-            {
+        while (!isspace(input[st]) && st <= end) {
+            if (input[st] == '\'') {
                 st++;
-                while (input[st] != '\'')
-                {
-
+                while (input[st] != '\'') {
                     argument.push_back(input[st]);
                     st++;
                 }
                 st++;
-            }
-            else if (input[st] == '\"')
-            {
-
+            } else if (input[st] == '\"') {
                 st++;
-                while (input[st] != '\"')
-                {
+                while (input[st] != '\"') {
                     argument.push_back(input[st]);
                     st++;
 
-                    if (input[st] == '\\')
-                    {
+                    if (input[st] == '\\') {
                         st++;
                         argument.push_back(input[st]);
                         st++;
                     }
                 }
                 st++;
-            }
-            else if (input[st] == '\\')
-            {
+            } else if (input[st] == '\\') {
                 // argument.push_back(input[st+1]);
                 st++;
-                if (st <= end)
-                {
+                if (st <= end) {
                     argument.push_back(input[st]);
                     st++;
                 }
-            }
-            else if (input[st] == '>')
-            {
-                if (input[st - 1] == '1' || isspace(input[st - 1]))
-                {
+            } else if (input[st] == '>') {
+                if (input[st - 1] == '1' || isspace(input[st - 1])) {
                     if (!isspace(input[st - 1]))
                         argument.pop_back();
                     this->has_output_redirection = true;
-                    if (input[st + 1] == '>')
-                    {
+                    if (input[st + 1] == '>') {
                         this->has_append_mode = true;
                         st++;
                     }
-                }
-                else if (input[st - 1] == '2')
-                {
+                } else if (input[st - 1] == '2') {
                     argument.pop_back();
                     this->has_error_redirection = true;
-                    if (input[st + 1] == '>')
-                    {
+                    if (input[st + 1] == '>') {
                         this->has_append_mode = true;
                         st++;
                     }
                 }
 
                 st++;
-            }
-            else if (input[st] == '|')
-            {
+            } else if (input[st] == '|') {
                 // this->argv_for_mult_cmd.push_back(this->argv);
                 // this->argv.clear();
                 // is_command = false;
                 st++;
 
-                if (!current_cmd.cmd.empty() || !current_cmd.argv.empty())
-                {
+                if (!current_cmd.cmd.empty() || !current_cmd.argv.empty()) {
                     q.push(current_cmd);
                 }
                 current_cmd = Cmd();
                 is_command = false;
 
                 break;
-            }
-            else
-            {
+            } else {
                 if (!isspace(input[st]))
                     argument.push_back(input[st]);
                 st++;
             }
         }
 
-        if (!is_command && !argument.empty())
-        {
-
+        if (!is_command && !argument.empty()) {
             // cmd.cmd = argument;
             // this->command.push_back(argument);
 
             // Check for builtin commmand
 
-            if(argument == "exit") {
+            if (argument == "exit") {
                 this->isExit = true;
                 break;
             }
@@ -138,14 +108,12 @@ Parser::Parser(const std::string input)
                 current_cmd.is_builtin = true;
 
             //  Check for executable
-            else
-            {
+            else {
                 Executable exe(argument);
 
                 if (exe())
                     current_cmd.is_builtin = false;
-                else
-                {
+                else {
                     this->is_valid_cmd = false;
                     std::cout << input << ": command not found" << std::endl;
                     break;
@@ -156,19 +124,12 @@ Parser::Parser(const std::string input)
             is_command = true;
         }
 
-        if (!argument.empty())
-        {
-            if (this->has_output_redirect())
-            {
+        if (!argument.empty()) {
+            if (this->has_output_redirect()) {
                 this->output_file = argument;
-            }
-            else if (this->has_error_redirect())
-            {
+            } else if (this->has_error_redirect()) {
                 this->error_file = argument;
-            }
-            else
-            {
-
+            } else {
                 // this->argv.push_back(argument);
                 current_cmd.argv.push_back(argument);
             }
@@ -177,50 +138,41 @@ Parser::Parser(const std::string input)
     }
 
     // Push the last command if it exists
-    if (!current_cmd.cmd.empty() || !current_cmd.argv.empty())
-    {
+    if (!current_cmd.cmd.empty() || !current_cmd.argv.empty()) {
         q.push(current_cmd);
     }
 }
 
-std::string Parser::get_output_file() const
-{
+std::string Parser::get_output_file() const {
     return this->output_file;
 }
 
-bool Parser::has_output_redirect() const
-{
+bool Parser::has_output_redirect() const {
     return this->has_output_redirection;
 }
 
-bool Parser::has_error_redirect() const
-{
+bool Parser::has_error_redirect() const {
     return this->has_error_redirection;
 }
 
-std::string Parser::get_error_file() const
-{
+std::string Parser::get_error_file() const {
     return this->error_file;
 }
 
-bool Parser::is_append_mode() const
-{
+bool Parser::is_append_mode() const {
     return this->has_append_mode;
 }
 
 
-bool Parser::get_valid_cmd() const
-{
+bool Parser::get_valid_cmd() const {
     return this->is_valid_cmd;
 }
 
 
-bool Parser::get_is_exit() const
-{
+bool Parser::get_is_exit() const {
     return this->isExit;
 }
 
-std::queue<Parser::Cmd> Parser::get_cmd_args_queue() const
-{
+std::queue<Parser::Cmd> Parser::get_cmd_args_queue() const {
     return this->q;
 }
