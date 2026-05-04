@@ -128,6 +128,16 @@ private:
 };
 
 
+class JOB final: public Builtin<Parser> {
+    private:
+     JOB();
+    public:
+    static JOB &getInstance();
+    void execute(const std::vector<std::string>& args) override;
+    std::string get_name() override;
+};
+
+
 
 
 #endif

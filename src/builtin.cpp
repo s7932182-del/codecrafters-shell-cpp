@@ -17,8 +17,8 @@ TYPE &TYPE::getInstance()
 void TYPE::execute(const std::vector<std::string> &args)
 {
 
-    auto &builtinMap = Builtin::getMap();
-    auto arg = args[1];
+    const auto &builtinMap = Builtin::getMap();
+    const auto& arg = args[1];
 
     if (builtinMap.count(arg))
     {
@@ -240,4 +240,23 @@ void HISTORY::execute(const std::vector<std::string> &args)
 std::string HISTORY::get_name()
 {
     return this->name;
+}
+
+
+
+// JOB class Implementation
+
+JOB::JOB() : Builtin("joba") {};
+std::string JOB::get_name() {
+    return this->name;
+}
+
+JOB &JOB::getInstance() {
+    static JOB instance;
+    return instance;
+}
+
+
+void JOB::execute(const std::vector<std::string> &args) {
+
 }

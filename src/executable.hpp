@@ -22,8 +22,7 @@ private:
 public:
     Executable(std::string command);
     std::string get_path();
-    bool operator()();
-    void operator()(Parser&);
+    bool operator()(); // to check is it executable or not
 };
 
 #endif

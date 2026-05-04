@@ -13,9 +13,7 @@
 #include "command_completion.hpp"
 #include "command_executer.hpp"
 
-std::string l_trim(std::string &input)
-{
-
+std::string l_trim(std::string &input) {
   int st = 0, end = input.length() - 1;
 
   while (st <= end && isspace(input[st]))
@@ -23,38 +21,36 @@ std::string l_trim(std::string &input)
   return input.substr(st);
 }
 
-void registerBuiltin()
-{
+void registerBuiltin() {
   Builtin<Parser>::register_command("type", &TYPE::getInstance());
   Builtin<Parser>::register_command("echo", &ECHO::getInstance());
   Builtin<Parser>::register_command("exit", &EXIT::getInstance());
   Builtin<Parser>::register_command("pwd", &PWD::getInstance());
   Builtin<Parser>::register_command("cd", &CD::getInstance());
   Builtin<Parser>::register_command("history", &HISTORY::getInstance());
+  Builtin<Parser>::register_command("jobs", &JOB::getInstance());
+
+
 }
 
-int main()
-{
-
+int main() {
   registerBuiltin();
 
   rl_attempted_completion_function = TabCompletor::my_completion;
   rl_bind_key('\t', rl_complete);
 
-   char* histfile = getenv("HISTFILE");
+  char *histfile = getenv("HISTFILE");
 
-   read_history(histfile);
+  read_history(histfile);
 
-  std::string input;
+
   char *line;
 
-  while ((line = readline("$ ")) != nullptr)
-  {
+  while ((line = readline("$ ")) != nullptr) {
     // input = line;
     // free(line);
 
-    if (strlen(line) > 0)
-    {
+    if (strlen(line) > 0) {
       add_history(line);
 
       std::string input(line);
@@ -63,18 +59,17 @@ int main()
 
       Parser ps(input);
 
-      if(ps.get_is_exit()) {
+      const bool is_valid = ps.get_valid_cmd();
+
+      if (ps.get_is_exit()) {
         write_history(histfile);
         break;
       };
-      if(ps.get_valid_cmd()) {
-         CommandExecutor::execute(ps);
+      if (is_valid) {
+        CommandExecutor::execute(ps);
       }
 
-    free(line);
+      free(line);
+    }
   }
-
-
-}
-
 }
