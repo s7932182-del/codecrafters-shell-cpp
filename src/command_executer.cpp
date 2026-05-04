@@ -71,9 +71,11 @@ void CommandExecutor::execute(Parser &ps) {
             if (pid == 0) {
                execvp(cmd.c_str(), exec_vector(argv).data());
             } else {
-                static int process_num = 0;
-                process_num++;
-                std::cout << "[" << process_num << "] " <<  pid << std::endl;
+                static int process_rank = 0;
+                process_rank++;
+                 std::string name = ps.get_cmd_string();
+                JOB::background_jobs.emplace_back(name,process_rank,pid);
+                std::cout << "[" << process_rank << "] " <<  pid << std::endl;
             }
         }
         else {

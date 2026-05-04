@@ -32,23 +32,25 @@ private:
     bool is_new_cmd;
     bool is_valid_cmd;
     bool isExit;
+    std::string cmd_string;
     
     public:
-    Parser(const std::string input);
+    Parser(const std::string& input);
     // std::vector<std::string> get_command();
     // std::vector<std::string> get_argv();
 
    
 
-    std::string get_output_file() const;
-    std::string get_error_file() const;
-    bool has_output_redirect() const;
-    bool has_error_redirect() const;
-    bool is_append_mode() const;
+    [[nodiscard]] std::string get_output_file() const;
+    [[nodiscard]] std::string get_error_file() const;
+    [[nodiscard]] bool has_output_redirect() const;
+    [[nodiscard]] bool has_error_redirect() const;
+    [[nodiscard]] bool is_append_mode() const;
     // std::vector<std::vector<std::string>> get_argv_for_mult_cmd() const;
-    std::queue<Cmd> get_cmd_args_queue() const;
-    bool get_valid_cmd() const;
-    bool get_is_exit() const;
+    [[nodiscard]] std::queue<Cmd> get_cmd_args_queue() const;
+    [[nodiscard]] bool get_valid_cmd() const;
+    [[nodiscard]] bool get_is_exit() const;
+    [[nodiscard]] std::string get_cmd_string() const;
 };
 
 #endif

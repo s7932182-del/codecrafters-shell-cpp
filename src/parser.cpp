@@ -5,7 +5,7 @@
 #include "builtin.hpp"
 #include <string>
 
-Parser::Parser(const std::string input) {
+Parser::Parser(const std::string& input) {
     // std::cout << "Input: " << input << std::endl;
 
     int st = 0, end = input.length() - 1;
@@ -18,6 +18,7 @@ Parser::Parser(const std::string input) {
     this->is_new_cmd = true;
     isExit = false;
     is_valid_cmd = true;
+    cmd_string = input;
 
     while (st <= end) {
         while (isspace(input[st]) && st <= end)
@@ -175,4 +176,8 @@ bool Parser::get_is_exit() const {
 
 std::queue<Parser::Cmd> Parser::get_cmd_args_queue() const {
     return this->q;
+}
+
+std::string  Parser::get_cmd_string() const {
+    return this->cmd_string;
 }
