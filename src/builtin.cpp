@@ -221,7 +221,10 @@ JOB &JOB::getInstance() {
 void JOB::execute(const std::vector<std::string> &) {
     const auto bj = JOB::background_jobs;
     for (const auto &job: bj) {
-        std::cout << "[" << job.rank << "]" << job.marker << "  " << job.status << std::setw(24) << job.name <<
+
+        std::string status = JOB::job_info::Status::RUNNING == job.status ? "Running" : "Stopped";
+
+        std::cout << "[" << job.rank << "]" << job.marker << "  " << status << std::setw(24) << job.name <<
                 std::endl;
     }
 }
