@@ -69,7 +69,6 @@ void CommandExecutor::execute(Parser &ps) {
             argv.pop_back();
             const pid_t pid = fork();
             if (pid == 0) {
-                freopen("/dev/null","w",stdout);
                execvp(cmd.c_str(), exec_vector(argv).data());
             } else {
                 static int process_num = 0;
