@@ -16,8 +16,8 @@ std::vector<char *> CommandExecutor::exec_vector(std::vector<std::string> &args)
     return argv;
 }
 
-void CommandExecutor::execute(Parser &ps) {
-    auto cmd_queue = ps.get_cmd_args_queue();
+void CommandExecutor::execute(const Parser &parser) {
+    auto cmd_queue = parser.get_cmd_args_queue();
 
     // TODO:
 
@@ -36,23 +36,23 @@ void CommandExecutor::execute(Parser &ps) {
             int saved_stdout = -1;
             int saved_stderr = -1;
 
-            if (ps.has_output_redirect()) {
+            if (parser.has_output_redirect()) {
                 saved_stdout = dup(STDOUT_FILENO);
-                const int output_file = open(ps.get_output_file().c_str(),
-                                             O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC), 0777);
+                const int output_file = open(parser.get_output_file().c_str(),
+                                             O_WRONLY | O_CREAT | (parser.is_append_mode() ? O_APPEND : O_TRUNC), 0777);
                 dup2(output_file, STDOUT_FILENO);
                 close(output_file);
             }
 
-            if (ps.has_error_redirect()) {
+            if (parser.has_error_redirect()) {
                 saved_stderr = dup(STDERR_FILENO);
-                const int error_file = open(ps.get_error_file().c_str(),
-                                            O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC), 0777);
+                const int error_file = open(parser.get_error_file().c_str(),
+                                            O_WRONLY | O_CREAT | (parser.is_append_mode() ? O_APPEND : O_TRUNC), 0777);
                 dup2(error_file, STDERR_FILENO);
                 close(error_file);
             }
 
-            auto builtin_cmd = Builtin<Parser>::getMap()[cmd];
+            const auto builtin_cmd = Builtin<Parser>::getMap()[cmd];
             builtin_cmd->execute(argv);
 
             // Restore original file descriptors
@@ -73,8 +73,25 @@ void CommandExecutor::execute(Parser &ps) {
             } else {
                 static int process_rank = 0;
                 process_rank++;
-                 std::string name = ps.get_cmd_string();
-                JOB::background_jobs.emplace_back(name,process_rank,pid);
+                 std::string name = parser.get_cmd_string();
+                auto& bj = JOB::background_jobs;
+                if (bj.empty()) {
+                    bj.emplace_back(name,process_rank,pid,'+');
+                } else {
+                    const auto& recent_bj = bj.end() -1;
+                    recent_bj->marker = '-';
+                    if (bj.size() == 1) {
+                        bj.emplace_back(name,process_rank,pid,'+');
+                    } else {
+                        const auto& last_recent_bj = bj.end() -2;
+                        last_recent_bj->marker = '\0';
+                        bj.emplace_back(name,process_rank,pid,'+');
+                    }
+
+
+
+                }
+
                 std::cout << "[" << process_rank << "] " <<  pid << std::endl;
             }
         }
@@ -85,9 +102,9 @@ void CommandExecutor::execute(Parser &ps) {
                 // ? child process
 
                 // / Setup redirections in child process only
-                if (ps.has_output_redirect()) {
-                    const int output_file = open(ps.get_output_file().c_str(),
-                                           O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC), 0777);
+                if (parser.has_output_redirect()) {
+                    const int output_file = open(parser.get_output_file().c_str(),
+                                           O_WRONLY | O_CREAT | (parser.is_append_mode() ? O_APPEND : O_TRUNC), 0777);
                     if (output_file == -1) {
                         perror("open output file");
                         exit(EXIT_FAILURE);
@@ -96,9 +113,9 @@ void CommandExecutor::execute(Parser &ps) {
                     close(output_file);
                 }
 
-                if (ps.has_error_redirect()) {
-                    const int error_file = open(ps.get_error_file().c_str(),
-                                          O_WRONLY | O_CREAT | (ps.is_append_mode() ? O_APPEND : O_TRUNC), 0777);
+                if (parser.has_error_redirect()) {
+                    const int error_file = open(parser.get_error_file().c_str(),
+                                          O_WRONLY | O_CREAT | (parser.is_append_mode() ? O_APPEND : O_TRUNC), 0777);
                     if (error_file == -1) {
                         perror("open error file");
                         exit(EXIT_FAILURE);

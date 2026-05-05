@@ -139,15 +139,15 @@ public:
 
     struct job_info {
         uint32_t rank;
-        char marker = '+';
         std::string name;
         pid_t pid;
+        char marker = '\0';
 
         enum Status { RUNNING, STOPPED, TERMINATED };
 
         Status status = RUNNING; // Default to RUNNING
 
-        job_info(std::string &n, const uint32_t number, const pid_t pid) : rank(number), name(std::move(n)), pid(pid) {
+        job_info(std::string &n, const uint32_t number, const pid_t pid, const char marker) : rank(number), name(std::move(n)), pid(pid), marker(marker) {
         }
     };
 
