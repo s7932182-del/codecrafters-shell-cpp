@@ -234,7 +234,7 @@ void JOB::execute(const std::vector<std::string> &) {
             std::cout << "[" << job.rank << "]" << job.marker << "  " << "Running" << std::setw(24) << job.name <<
                     std::endl;
         } else {
-            std::cout << "JOB IS STOPPING" << std::endl;
+            // std::cout << "JOB IS STOPPING" << std::endl;
             if (WIFEXITED(state)) {
                 // std::cout << "\n[Job " << job.pid << "] exited with status: "
                 //         << WEXITSTATUS(state) << std::endl;
