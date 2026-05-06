@@ -143,12 +143,15 @@ public:
         pid_t pid;
         char marker = '\0';
 
+
         enum Status { RUNNING, EXITED };
 
         Status status = RUNNING; // Default to RUNNING
 
-        job_info( const uint32_t rank,std::string &n, const pid_t pid, const char marker) : rank(rank), name(std::move(n)), pid(pid), marker(marker) {
+        job_info( const uint32_t rank,std::string &n, const pid_t pid, const char marker) : rank(rank), name(n), pid(pid), marker(marker) {
         }
+
+
     };
 
     static std::vector<job_info> background_jobs;
