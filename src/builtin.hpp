@@ -153,7 +153,7 @@ public:
 
         void print(const bool isRunning = true) {
             if (isRunning) {
-                std::cout << "[" << this->rank << "]" << this->marker << "  " << "Running" << std::setw(24) << this->name <<
+                std::cout << "[" << this->rank << "]" << this->marker << "  " << "Running " << std::setw(24) << this->name <<
                     std::endl;
             } else {
                 std::cout << "[" << rank << "]" << marker << "  " << "Done" << std::setw(24)  << name.substr(0,name.size() -1) << std::endl;
