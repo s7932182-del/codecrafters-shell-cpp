@@ -257,7 +257,7 @@ void JOB::execute(const std::vector<std::string> &) {
                 // std::cout << "\n[Job " << job.pid << "] exited with status: "
                 //         << WEXITSTATUS(state) << std::endl;
                 job.status = JOB::job_info::Status::EXITED;
-                job.print();
+                job.print(false);
             }
             else if (WIFSIGNALED(state)) {
                 std::cout << "\n[Job " << job.pid << "] killed by signal: "
