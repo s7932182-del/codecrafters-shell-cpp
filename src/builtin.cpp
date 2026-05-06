@@ -219,12 +219,42 @@ JOB &JOB::getInstance() {
 
 
 void JOB::execute(const std::vector<std::string> &) {
-    const auto bj = JOB::background_jobs;
-    for (const auto &job: bj) {
+    auto bj = JOB::background_jobs;
+    for (auto &job: bj) {
+        // check the child process is successfully exit or not
+        int state;
+        const pid_t result = waitpid(job.pid, &state, WNOHANG);
+        // std::string job_status = JOB::job_info::Status::RUNNING == job.status ? "Running" : "Stopped";
 
-        std::string status = JOB::job_info::Status::RUNNING == job.status ? "Running" : "Stopped";
+        if (result == -1) {
+            std::cerr << "JOB WITH ID: " << job.pid << "Not Found" << std::endl;
+        } else if (result == 0) {
+            // std::cout << "JOB IS RUNNING" << std::endl;
+            job.status = JOB::job_info::Status::RUNNING;
+            std::cout << "[" << job.rank << "]" << job.marker << "  " << "Running" << std::setw(24) << job.name <<
+                    std::endl;
+        } else {
+            std::cout << "JOB IS STOPPING" << std::endl;
+            if (WIFEXITED(state)) {
+                // std::cout << "\n[Job " << job.pid << "] exited with status: "
+                //         << WEXITSTATUS(state) << std::endl;
+                job.status = JOB::job_info::Status::EXITED;
 
-        std::cout << "[" << job.rank << "]" << job.marker << "  " << status << std::setw(24) << job.name <<
-                std::endl;
+                std::cout << "[" << job.rank << "]" << job.marker << "  " << "Done" << std::setw(24) << job.name <<
+                        std::endl;
+            } else if (WIFSIGNALED(state)) {
+                std::cout << "\n[Job " << job.pid << "] killed by signal: "
+                        << WTERMSIG(state) << std::endl;
+            }
+
+
+            auto it = std::ranges::find_if(bj, [&job](const JOB::job_info &j) {
+                return j.status == JOB::job_info::Status::EXITED;
+            });
+
+            if (it != bj.end()) {
+                bj.erase(it);
+            }
+        }
     }
 }

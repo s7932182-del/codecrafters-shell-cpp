@@ -87,9 +87,6 @@ void CommandExecutor::execute(const Parser &parser) {
                         last_recent_bj->marker = '\0';
                         bj.emplace_back(name,process_rank,pid,'+');
                     }
-
-
-
                 }
 
                 std::cout << "[" << process_rank << "] " <<  pid << std::endl;

@@ -143,7 +143,7 @@ public:
         pid_t pid;
         char marker = '\0';
 
-        enum Status { RUNNING, STOPPED, TERMINATED };
+        enum Status { RUNNING, EXITED };
 
         Status status = RUNNING; // Default to RUNNING
 
