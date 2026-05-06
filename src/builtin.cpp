@@ -249,8 +249,7 @@ void JOB::execute(const std::vector<std::string> &) {
         if (result == 0) {
             // std::cout << "JOB IS RUNNING" << std::endl;
             job.status = JOB::job_info::Status::RUNNING;
-            std::cout << "[" << job.rank << "]" << job.marker << "  " << "Running" << std::setw(24) << job.name <<
-                    std::endl;
+            job.print();
         }
         else {
             // std::cout << "JOB IS STOPPING" << std::endl;
@@ -258,11 +257,7 @@ void JOB::execute(const std::vector<std::string> &) {
                 // std::cout << "\n[Job " << job.pid << "] exited with status: "
                 //         << WEXITSTATUS(state) << std::endl;
                 job.status = JOB::job_info::Status::EXITED;
-
-
-
-                std::cout << "[" << job.rank << "]" << job.marker << "  " << "Done" << std::setw(24)  << job.name.substr(0,job.name.size() -1) << std::endl;
-
+                job.print();
             }
             else if (WIFSIGNALED(state)) {
                 std::cout << "\n[Job " << job.pid << "] killed by signal: "

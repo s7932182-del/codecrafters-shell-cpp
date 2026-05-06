@@ -151,12 +151,21 @@ public:
         job_info( const uint32_t rank,std::string &n, const pid_t pid, const char marker) : rank(rank), name(n), pid(pid), marker(marker) {
         }
 
+        void print(const bool isRunning = true) {
+            if (isRunning) {
+                std::cout << "[" << this->rank << "]" << this->marker << "  " << "Running" << std::setw(24) << this->name <<
+                    std::endl;
+            } else {
+                std::cout << "[" << rank << "]" << marker << "  " << "Done" << std::setw(24)  << name.substr(0,name.size() -1) << std::endl;
+            }
+        }
+
 
     };
 
     static std::vector<job_info> background_jobs;
 
-    static void set_marker();
+
 };
 
 
