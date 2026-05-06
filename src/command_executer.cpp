@@ -67,25 +67,26 @@ void CommandExecutor::execute(const Parser &parser) {
         }
         else if (is_background_job) {
             argv.pop_back();
+            static int process_rank = 0;
             const pid_t pid = fork();
             if (pid == 0) {
                execvp(cmd.c_str(), exec_vector(argv).data());
             } else {
-                static int process_rank = 0;
+
                 process_rank++;
                  std::string name = parser.get_cmd_string();
                 auto& bj = JOB::background_jobs;
                 if (bj.empty()) {
-                    bj.emplace_back(name,process_rank,pid,'+');
+                    bj.emplace_back(process_rank,name,pid,'+');
                 } else {
                     const auto& recent_bj = bj.end() -1;
                     recent_bj->marker = '-';
                     if (bj.size() == 1) {
-                        bj.emplace_back(name,process_rank,pid,'+');
+                        bj.emplace_back(process_rank,name,pid,'+');
                     } else {
                         const auto& last_recent_bj = bj.end() -2;
                         last_recent_bj->marker = '\0';
-                        bj.emplace_back(name,process_rank,pid,'+');
+                        bj.emplace_back(process_rank,name,pid,'+');
                     }
                 }
 

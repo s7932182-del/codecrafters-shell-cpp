@@ -138,7 +138,7 @@ public:
     std::string get_name() override;
 
     struct job_info {
-        uint32_t rank;
+         uint32_t rank;
         std::string name;
         pid_t pid;
         char marker = '\0';
@@ -147,11 +147,13 @@ public:
 
         Status status = RUNNING; // Default to RUNNING
 
-        job_info(std::string &n, const uint32_t number, const pid_t pid, const char marker) : rank(number), name(std::move(n)), pid(pid), marker(marker) {
+        job_info( const uint32_t rank,std::string &n, const pid_t pid, const char marker) : rank(rank), name(std::move(n)), pid(pid), marker(marker) {
         }
     };
 
     static std::vector<job_info> background_jobs;
+
+    static void set_marker();
 };
 
 

@@ -205,7 +205,9 @@ std::string HISTORY::get_name() {
 
 std::vector<JOB::job_info> JOB::background_jobs;
 
-JOB::JOB() : Builtin("joba") {
+
+
+JOB::JOB() : Builtin("job") {
 };
 
 std::string JOB::get_name() {
@@ -218,8 +220,23 @@ JOB &JOB::getInstance() {
 }
 
 
+void reorder_marker(auto &background_jobs) {
+
+   if (background_jobs.empty()) {return;}
+   if (background_jobs.size() == 1) {
+       auto& bj = background_jobs.back();
+       bj.marker = '+';
+   } else {
+       auto& bj1 = background_jobs.back();
+       bj1.marker = '+';
+      const auto& bj2 = background_jobs.end() -2;
+       bj2->marker = '-';
+   }
+}
+
+
 void JOB::execute(const std::vector<std::string> &) {
-    auto bj = JOB::background_jobs;
+    auto& bj = JOB::background_jobs;
     for (auto &job: bj) {
         // check the child process is successfully exit or not
         int state;
@@ -234,22 +251,23 @@ void JOB::execute(const std::vector<std::string> &) {
             job.status = JOB::job_info::Status::RUNNING;
             std::cout << "[" << job.rank << "]" << job.marker << "  " << "Running" << std::setw(24) << job.name <<
                     std::endl;
-        } else {
+        }
+        else {
             // std::cout << "JOB IS STOPPING" << std::endl;
             if (WIFEXITED(state)) {
                 // std::cout << "\n[Job " << job.pid << "] exited with status: "
                 //         << WEXITSTATUS(state) << std::endl;
                 job.status = JOB::job_info::Status::EXITED;
 
-                const std::string job_name = job.name.substr(0,  job.name.size() - 1);
 
-                std::cout << "[" << job.rank << "]" << job.marker << "  " << "Done" << std::setw(24)  << job_name << std::endl;
 
-            } else if (WIFSIGNALED(state)) {
+                std::cout << "[" << job.rank << "]" << job.marker << "  " << "Done" << std::setw(24)  << job.name.substr(0,job.name.size() -1) << std::endl;
+
+            }
+            else if (WIFSIGNALED(state)) {
                 std::cout << "\n[Job " << job.pid << "] killed by signal: "
                         << WTERMSIG(state) << std::endl;
             }
-
 
             auto it = std::ranges::find_if(bj, [&job](const JOB::job_info &j) {
                 return j.status == JOB::job_info::Status::EXITED;
@@ -258,6 +276,8 @@ void JOB::execute(const std::vector<std::string> &) {
             if (it != bj.end()) {
                 bj.erase(it);
             }
+            reorder_marker(bj);
+
         }
     }
 }
