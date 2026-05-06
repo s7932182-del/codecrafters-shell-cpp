@@ -237,42 +237,40 @@ void reorder_marker(auto &background_jobs) {
 
 void JOB::execute(const std::vector<std::string> &) {
     auto& bj = JOB::background_jobs;
-    for (auto &job: bj) {
-        // check the child process is successfully exit or not
+
+    for (auto it = bj.begin(); it != bj.end(); ) {
         int state;
-        const pid_t result = waitpid(job.pid, &state, WNOHANG);
-        // std::string job_status = JOB::job_info::Status::RUNNING == job.status ? "Running" : "Stopped";
+        pid_t result = waitpid(it->pid, &state, WNOHANG);
 
         if (result == -1) {
-           return;
+            ++it;  // Error? Move to next
+            continue;
         }
+
         if (result == 0) {
-            // std::cout << "JOB IS RUNNING" << std::endl;
-            job.status = JOB::job_info::Status::RUNNING;
-            job.print();
+            // Still running
+            it->status = JOB::job_info::Status::RUNNING;
+            it->print();
+            ++it;  // Move to next
         }
         else {
-            // std::cout << "JOB IS STOPPING" << std::endl;
+            // Process finished
             if (WIFEXITED(state)) {
-                // std::cout << "\n[Job " << job.pid << "] exited with status: "
-                //         << WEXITSTATUS(state) << std::endl;
-                job.status = JOB::job_info::Status::EXITED;
-                job.print(false);
+                it->status = JOB::job_info::Status::EXITED;
+                it->print(false);
             }
             else if (WIFSIGNALED(state)) {
-                std::cout << "\n[Job " << job.pid << "] killed by signal: "
-                        << WTERMSIG(state) << std::endl;
+                std::cout << "\n[Job " << it->pid << "] killed by signal: "
+                          << WTERMSIG(state) << std::endl;
             }
 
-            auto it = std::ranges::find_if(bj, [&job](const JOB::job_info &j) {
-                return j.status == JOB::job_info::Status::EXITED;
-            });
+            // erase returns iterator to next element
+            it = bj.erase(it);  // ✅ Safe - it points to next element
 
-            if (it != bj.end()) {
-                bj.erase(it);
+            // Reorder markers after deletion
+            if (!bj.empty()) {
+                reorder_marker(bj);
             }
-            reorder_marker(bj);
-
         }
     }
 }
