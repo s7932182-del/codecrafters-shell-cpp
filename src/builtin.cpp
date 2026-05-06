@@ -240,7 +240,7 @@ void JOB::execute(const std::vector<std::string> &) {
                 //         << WEXITSTATUS(state) << std::endl;
                 job.status = JOB::job_info::Status::EXITED;
 
-                std::cout << "[" << job.rank << "]" << job.marker << "  " << "Done" << std::setw(24) << job.name <<
+                std::cout << "[" << job.rank << "]" << job.marker << "  " << "Done" << std::setw(24) << "" << job.name <<
                         std::endl;
             } else if (WIFSIGNALED(state)) {
                 std::cout << "\n[Job " << job.pid << "] killed by signal: "
