@@ -227,8 +227,9 @@ void JOB::execute(const std::vector<std::string> &) {
         // std::string job_status = JOB::job_info::Status::RUNNING == job.status ? "Running" : "Stopped";
 
         if (result == -1) {
-            std::cerr << "JOB WITH ID: " << job.pid << "Not Found" << std::endl;
-        } else if (result == 0) {
+           return;
+        }
+        if (result == 0) {
             // std::cout << "JOB IS RUNNING" << std::endl;
             job.status = JOB::job_info::Status::RUNNING;
             std::cout << "[" << job.rank << "]" << job.marker << "  " << "Running" << std::setw(24) << job.name <<
