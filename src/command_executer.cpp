@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include "backgroundJob.hpp"
 
 std::vector<char *> CommandExecutor::exec_vector(std::vector<std::string> &args) {
     std::vector<char *> argv;
@@ -55,6 +56,8 @@ void CommandExecutor::execute(const Parser &parser) {
             const auto builtin_cmd = Builtin<Parser>::getMap()[cmd];
             builtin_cmd->execute(argv);
 
+
+
             // Restore original file descriptors
             if (saved_stdout != -1) {
                 dup2(saved_stdout, STDOUT_FILENO);
@@ -74,22 +77,8 @@ void CommandExecutor::execute(const Parser &parser) {
             } else {
 
                 process_rank++;
-                 std::string name = parser.get_cmd_string();
-                auto& bj = JOB::background_jobs;
-                if (bj.empty()) {
-                    bj.emplace_back(process_rank,name,pid,'+');
-                } else {
-                    const auto& recent_bj = bj.end() -1;
-                    recent_bj->marker = '-';
-                    if (bj.size() == 1) {
-                        bj.emplace_back(process_rank,name,pid,'+');
-                    } else {
-                        const auto& last_recent_bj = bj.end() -2;
-                        last_recent_bj->marker = '\0';
-                        bj.emplace_back(process_rank,name,pid,'+');
-                    }
-                }
-
+                const std::string name = parser.get_cmd_string();
+                BackgroundProcess::push_jobs(process_rank,name,pid);
                 std::cout << "[" << process_rank << "] " <<  pid << std::endl;
             }
         }
@@ -151,9 +140,9 @@ void CommandExecutor::execute(const Parser &parser) {
         */
 
         while (!cmd_queue.empty()) {
-            auto current_cmd = cmd_queue.front();
+            auto [cmd, argv, is_builtin] = cmd_queue.front();
             cmd_queue.pop();
-            bool is_last = cmd_queue.empty();
+            const bool is_last = cmd_queue.empty();
 
             if (!is_last) {
                 if (pipe(fd) == -1) {
@@ -210,14 +199,14 @@ void CommandExecutor::execute(const Parser &parser) {
                 // }
 
 
-                if (current_cmd.is_builtin) {
-                    auto builtin_cmd = Builtin<Parser>::getMap()[current_cmd.cmd];
-                    builtin_cmd->execute(current_cmd.argv);
+                if (is_builtin) {
+                    auto builtin_cmd = Builtin<Parser>::getMap()[cmd];
+                    builtin_cmd->execute(argv);
                     fflush(stdout);
                     fflush(stderr);
                     exit(0); // Important: Exit child after built-in execution
                 } else {
-                    execvp(current_cmd.cmd.c_str(), exec_vector(current_cmd.argv).data());
+                    execvp(cmd.c_str(), exec_vector(argv).data());
                     std::cerr << "Error in execvp" << std::endl;
                     exit(1);
                 }

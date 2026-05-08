@@ -2,6 +2,7 @@
 #include <filesystem>
 #include "parser.hpp"
 #include <readline/history.h>
+#include "backgroundJob.hpp"
 #include<iomanip>
 
 namespace fs = std::filesystem;
@@ -236,41 +237,19 @@ void reorder_marker(auto &background_jobs) {
 
 
 void JOB::execute(const std::vector<std::string> &) {
-    auto& bj = JOB::background_jobs;
+    auto& bj = BackgroundProcess::background_jobs;
 
-    for (auto it = bj.begin(); it != bj.end(); ) {
-        int state;
-        pid_t result = waitpid(it->pid, &state, WNOHANG);
-
-        if (result == -1) {
-            ++it;  // Error? Move to next
-            continue;
+    for (auto job = bj.begin(); job != bj.end(); ) {
+        auto current = *job;
+        if (current.get_status() == BackgroundProcess::Status::NOT_FOUND ) {
+              ++job;
         }
-
-        if (result == 0) {
-            // Still running
-            it->status = JOB::job_info::Status::RUNNING;
-            it->print();
-            ++it;  // Move to next
-        }
-        else {
-            // Process finished
-            if (WIFEXITED(state)) {
-                it->status = JOB::job_info::Status::EXITED;
-                it->print(false);
-            }
-            else if (WIFSIGNALED(state)) {
-                std::cout << "\n[Job " << it->pid << "] killed by signal: "
-                          << WTERMSIG(state) << std::endl;
-            }
-
-            // erase returns iterator to next element
-            it = bj.erase(it);  // ✅ Safe - it points to next element
-
-            // Reorder markers after deletion
-            if (!bj.empty()) {
-                reorder_marker(bj);
-            }
+        if (current.get_status() == BackgroundProcess::Status::RUNNING) {
+            current.print();
+            ++job;
+        } else {
+            current.print(false);
+            BackgroundProcess::pop_job(job);
         }
     }
 }

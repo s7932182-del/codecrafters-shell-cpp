@@ -133,7 +133,7 @@ private:
 public:
     static JOB &getInstance();
 
-    void execute(const std::vector<std::string> &args) override;
+    void execute(const std::vector<std::string>&) override;
 
     std::string get_name() override;
 
@@ -151,7 +151,7 @@ public:
         job_info( const uint32_t rank,std::string &n, const pid_t pid, const char marker) : rank(rank), name(n), pid(pid), marker(marker) {
         }
 
-        void print(const bool isRunning = true) {
+        void print(const bool isRunning = true) const {
             if (isRunning) {
                 std::cout << "[" << this->rank << "]" << this->marker << "  " << "Running " << std::setw(24) << this->name <<
                     std::endl;
