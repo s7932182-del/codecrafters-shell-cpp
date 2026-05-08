@@ -244,7 +244,7 @@ void JOB::execute(const std::vector<std::string> &) {
         if (current.get_status() == BackgroundProcess::Status::NOT_FOUND ) {
               ++job;
         }
-        if (current.get_status() == BackgroundProcess::Status::RUNNING) {
+        else if (current.get_status() == BackgroundProcess::Status::RUNNING) {
             current.print();
             ++job;
         } else {

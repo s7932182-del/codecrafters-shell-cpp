@@ -72,7 +72,7 @@ int main() {
        const std::string cmd = ps.get_cmd_string().substr(0, 4);
 
         if (cmd != "jobs") {
-          auto b_job = BackgroundProcess::background_jobs;
+          auto& b_job = BackgroundProcess::background_jobs;
           for (auto job = b_job.begin(); job != b_job.end();) {
             auto current_job = *job;
             if (current_job.get_status() == BackgroundProcess::Status::EXITED) {
