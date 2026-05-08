@@ -74,7 +74,7 @@ int main() {
         if (cmd != "jobs") {
           auto& b_job = BackgroundProcess::background_jobs;
           for (auto job = b_job.begin(); job != b_job.end();) {
-            auto current_job = *job;
+           const auto& current_job = *job;
             if (current_job.get_status() == BackgroundProcess::Status::EXITED) {
               current_job.print(false);
               BackgroundProcess::pop_job(job);

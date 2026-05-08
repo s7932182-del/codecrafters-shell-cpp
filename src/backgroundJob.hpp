@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 #include <sys/wait.h>
-
+#include <queue>
 class BackgroundProcess {
 public:
     enum Status { RUNNING, EXITED, NOT_FOUND };
@@ -60,6 +60,7 @@ public:
     static std::vector<job_info> background_jobs;
     static void push_jobs(uint32_t rank, const std::string &n, pid_t pid);
     static void pop_job(std::vector<job_info>::iterator& job);
+    static std::queue<uint32_t> job_rank;
 
 };
 

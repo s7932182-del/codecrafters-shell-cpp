@@ -76,9 +76,18 @@ void CommandExecutor::execute(const Parser &parser) {
                execvp(cmd.c_str(), exec_vector(argv).data());
             } else {
 
-                process_rank++;
+                auto& rank_queue = BackgroundProcess::job_rank;
+                uint32_t rank;
+                if (rank_queue.empty()) {
+                    process_rank++;
+                    rank = process_rank;
+                } else {
+                    rank = rank_queue.front();
+                    rank_queue.pop();
+                }
+
                 const std::string name = parser.get_cmd_string();
-                BackgroundProcess::push_jobs(process_rank,name,pid);
+                BackgroundProcess::push_jobs(rank,name,pid);
                 std::cout << "[" << process_rank << "] " <<  pid << std::endl;
             }
         }
