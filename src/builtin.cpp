@@ -269,5 +269,9 @@ COMPLETE &COMPLETE::getInstance() {
 }
 
 void COMPLETE::execute(const std::vector<std::string> &args) {
-
+    const std::string& pFlag = args[0];
+    const std::string& pFlag_cmd = args[1];
+    if (pFlag == "-p") {
+        std::cout << "complete: " << pFlag_cmd << ": no completion specification" << std::endl;
+    }
 }
