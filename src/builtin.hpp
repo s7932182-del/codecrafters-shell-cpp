@@ -169,4 +169,12 @@ public:
 };
 
 
+class COMPLETE final : public Builtin<Parser> {
+    private:
+    COMPLETE();
+    public:
+    static COMPLETE &getInstance();
+    void execute(const std::vector<std::string> &args) override;
+    std::string get_name() override;
+};
 #endif

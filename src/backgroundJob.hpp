@@ -10,14 +10,15 @@
 #include <iostream>
 #include <iomanip>
 #include <unistd.h>
-#include <utility>
 #include <vector>
 #include <sys/wait.h>
 #include <queue>
+
 class BackgroundProcess {
 public:
     enum Status { RUNNING, EXITED, NOT_FOUND };
-    private:
+
+private:
     struct job_info {
         uint32_t rank;
         std::string name;
@@ -25,10 +26,10 @@ public:
         char marker = '\0';
 
 
-
         Status status = RUNNING; // Default to RUNNING
 
-        job_info(const uint32_t rank, std::string n, const pid_t pid, const char marker) : rank(rank), name(std::move(n)),
+        job_info(const uint32_t rank, std::string n, const pid_t pid, const char marker) : rank(rank),
+            name(std::move(n)),
             pid(pid), marker(marker) {
         }
 
@@ -52,16 +53,13 @@ public:
         }
     };
 
-
-
 public:
-
     BackgroundProcess() = default;
+
     static std::vector<job_info> background_jobs;
     static void push_jobs(uint32_t rank, const std::string &n, pid_t pid);
-    static void pop_job(std::vector<job_info>::iterator& job);
+    static void pop_job(std::vector<job_info>::iterator &job);
     static std::queue<uint32_t> job_rank;
-
 };
 
 

@@ -30,6 +30,7 @@ void registerBuiltin() {
   Builtin<Parser>::register_command("cd", &CD::getInstance());
   Builtin<Parser>::register_command("history", &HISTORY::getInstance());
   Builtin<Parser>::register_command("jobs", &JOB::getInstance());
+  Builtin<Parser>::register_command("complete", &COMPLETE::getInstance());
 
 
 }

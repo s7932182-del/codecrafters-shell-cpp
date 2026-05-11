@@ -253,3 +253,21 @@ void JOB::execute(const std::vector<std::string> &) {
         }
     }
 }
+
+
+
+// COMPLETION IMPLEMENTATION
+
+COMPLETE::COMPLETE() : Builtin("complete") {}
+std::string COMPLETE::get_name() {
+    return this->name;
+}
+
+COMPLETE &COMPLETE::getInstance() {
+    static COMPLETE instance;
+    return instance;
+}
+
+void COMPLETE::execute(const std::vector<std::string> &args) {
+
+}

@@ -4,12 +4,9 @@
 
 #include "backgroundJob.hpp"
 
-// BackgroundProcess::BackgroundProcess(const uint32_t rank, const std::string &n, const pid_t pid, const char marker) {
-//     background_jobs(rank, n, pid, marker);
-// }
-
 std::vector<BackgroundProcess::job_info> BackgroundProcess::background_jobs;
- std::queue<uint32_t> BackgroundProcess::job_rank;
+std::queue<uint32_t> BackgroundProcess::job_rank;
+void reorder_marker(auto &background_jobs);
 
 void BackgroundProcess::push_jobs(const uint32_t rank, const std::string &n, const pid_t pid) {
     if (background_jobs.empty()) {
@@ -27,6 +24,14 @@ void BackgroundProcess::push_jobs(const uint32_t rank, const std::string &n, con
     }
 }
 
+void BackgroundProcess::pop_job(std::vector<job_info>::iterator& job) {
+       BackgroundProcess::job_rank.push(job->rank);
+       job = background_jobs.erase(job);
+      if (!background_jobs.empty()) {
+          reorder_marker(background_jobs);
+      }
+
+}
 
 void reorder_marker(auto &background_jobs) {
 
@@ -40,12 +45,4 @@ void reorder_marker(auto &background_jobs) {
         const auto& bj2 = background_jobs.end() -2;
         bj2->marker = '-';
     }
-}
-void BackgroundProcess::pop_job(std::vector<job_info>::iterator& job) {
-       BackgroundProcess::job_rank.push(job->rank);
-       job = background_jobs.erase(job);
-      if (!background_jobs.empty()) {
-          reorder_marker(background_jobs);
-      }
-
 }
