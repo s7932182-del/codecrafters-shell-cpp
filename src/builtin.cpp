@@ -258,6 +258,9 @@ void JOB::execute(const std::vector<std::string> &) {
 
 // COMPLETION IMPLEMENTATION
 
+
+std::unordered_map<std::string,std::string> COMPLETE::script_list;
+
 COMPLETE::COMPLETE() : Builtin("complete") {}
 std::string COMPLETE::get_name() {
     return this->name;
@@ -269,10 +272,31 @@ COMPLETE &COMPLETE::getInstance() {
 }
 
 void COMPLETE::execute(const std::vector<std::string> &args) {
-    const std::string& pFlag = args[1];
-    // std::cout << args[0] << " " << args[1] << args[2] << std::endl;
-    const std::string& pFlag_cmd = args[2];
-    if (pFlag == "-p") {
-        std::cout << "complete: " << pFlag_cmd << ": no completion specification" << std::endl;
+    // const std::string& pFlag = args[1];
+    // // std::cout << args[0] << " " << args[1] << args[2] << std::endl;
+    // const std::string& pFlag_cmd = args[2];
+
+
+    for (auto it = args.begin() + 1; it != args.end(); ++it) {
+           const auto &arg = *it;
+
+           if (arg == "-p") {
+               ++it;
+               const std::string &cmd = *it;
+               const auto &script_it = script_list.find(cmd);
+
+               if (script_it != script_list.end()) {
+                   std::cout << "complete -C " << std::quoted(script_it->second, '\'') << " " << cmd << std::endl;
+               } else {
+                   std::cout << "complete: " << cmd << ": " << "no completion specification" << std::endl;
+               }
+           } else if (arg == "-C") {
+               ++it;
+               const std::string &path = *it;
+               ++it;
+               const std::string &cmd = *it;
+               script_list[cmd] = path;
+           }
     }
+
 }
