@@ -62,6 +62,7 @@ private:
     static char *argument_generator(const char *text, const int state) {
         if (state == 0) {
             matches.clear();
+            match_index = 0;
 
             const int end = rl_end;
             const char *line = rl_line_buffer;
