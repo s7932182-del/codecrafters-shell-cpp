@@ -1,6 +1,7 @@
 #ifndef COMMAND_COMPLETION_HPP
 #define COMMAND_COMPLETION_HPP
 
+#include <complex>
 #include <iostream>
 #include <vector>
 #include "builtin.hpp"
@@ -57,23 +58,32 @@ private:
 
         return nullptr;
     }
-   static char * argument_generator(const char *text, const int state) {
+
+    static char *argument_generator(const char *text, const int state) {
         if (state == 0) {
             matches.clear();
 
-            const int cursor_at  = rl_point;
-            const char * line = rl_line_buffer;
+            const int end = rl_end;
+            const char *line = rl_line_buffer;
+            std::string arg1 = "";
+            std::string arg3 = "";
+            std::string arg2(text);
             std::string cmd;
 
-            for (int  i = 0; i<cursor_at; i++) {
-                if (line[i] == ' ') {
-                    cmd = std::string(line,i);
-                    break;
-                }
+            std::istringstream input_str(line);
+            std::vector<std::string> words;
+            std::string word;
+            while (input_str >> word) {
+                words.push_back(word);
             }
 
+            cmd = arg1 = std::string(words[0]);
+            arg2 = text;
+            if (words.size() == 3) arg3 = words[1];
+
+
             if (!cmd.empty()) {
-                auto it  = COMPLETE::script_list.find(cmd);
+                auto it = COMPLETE::script_list.find(cmd);
                 if (it != COMPLETE::script_list.end()) {
                     const std::string exe = it->second;
                     int pipeFd[2];
@@ -83,7 +93,7 @@ private:
                         close(pipeFd[0]);
                         dup2(pipeFd[1], STDOUT_FILENO);
                         close(pipeFd[1]);
-                        execl(exe.c_str(), exe.c_str(), nullptr);
+                        execl(exe.c_str(), exe.c_str(), arg1.c_str(), arg2.c_str(), arg3.c_str(), nullptr);
                         perror("execl");
                         exit(1);
                     } else {
@@ -95,7 +105,7 @@ private:
                             buffer[bytes] = '\0';
                             output += buffer;
                         }
-                       close(pipeFd[0]);
+                        close(pipeFd[0]);
                         wait(nullptr);
                         std::istringstream iss(output);
 
@@ -103,7 +113,6 @@ private:
                         while (iss >> match) {
                             matches.push_back(match);
                         }
-
                     }
                 }
             }
@@ -111,14 +120,14 @@ private:
 
         // Return matches that match current text
         while (match_index < matches.size()) {
-            const std::string& match = matches[match_index++];
+            const std::string &match = matches[match_index++];
             if (match.compare(0, strlen(text), text) == 0) {
                 return strdup(match.c_str());
             }
         }
         return nullptr;
-
     }
+
 public:
     TabCompletor() = delete;
 
@@ -126,22 +135,29 @@ public:
         if (start == 0)
             return rl_completion_matches(text, command_generator);
         else {
-            const char* line = rl_line_buffer;
-            const std::string cmd(line, start - 1);
-            const std::string prev_word(line, start);
+            const char *line = rl_line_buffer;
 
-            if (prev_word == (cmd + ' ')) {
-                auto it = COMPLETE::script_list.find(cmd);
-                if (it != COMPLETE::script_list.end()) {
-                    // Use the custom generator for this command
-                    return rl_completion_matches(text, argument_generator);
+            std::string cmd;
+            for (int i = 0; i < end; i++) {
+                if (line[i] == ' ') {
+                    cmd = std::string(line, i);
+                    break;
                 }
             }
+            std::string cmd_spaces = cmd + ' ';
+
+            auto it = COMPLETE::script_list.find(cmd);
+            if (it != COMPLETE::script_list.end()) {
+                // Use the custom generator for this command
+                std::string first = it->first + " ";
+                if (cmd_spaces == first)
+                    return rl_completion_matches(text, argument_generator);
+            }
+
 
             // Fallback to filename completion
             return rl_completion_matches(text, rl_filename_completion_function);
         }
-
     }
 };
 
