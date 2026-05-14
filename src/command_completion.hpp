@@ -90,6 +90,9 @@ private:
                     pipe(pipeFd);
                     const pid_t pid = fork();
                     if (pid == 0) {
+
+                        setenv("COMP_LINE", line, 1);
+                        setenv("COMP_POINT", std::to_string(rl_point).c_str(), 1);
                         close(pipeFd[0]);
                         dup2(pipeFd[1], STDOUT_FILENO);
                         close(pipeFd[1]);
