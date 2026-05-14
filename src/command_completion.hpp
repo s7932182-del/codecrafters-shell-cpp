@@ -84,6 +84,8 @@ private:
                         dup2(pipeFd[1], STDOUT_FILENO);
                         close(pipeFd[1]);
                         execl(cmd.c_str(), exe.c_str(), nullptr);
+                        perror("execl");
+                        exit(1);
                     } else {
                         close(pipeFd[1]);
                         std::string output;
@@ -139,7 +141,7 @@ public:
             // Fallback to filename completion
             return rl_completion_matches(text, rl_filename_completion_function);
         }
-        return  nullptr;
+
     }
 };
 
