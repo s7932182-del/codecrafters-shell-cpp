@@ -83,7 +83,7 @@ private:
                         close(pipeFd[0]);
                         dup2(pipeFd[1], STDOUT_FILENO);
                         close(pipeFd[1]);
-                        execl(cmd.c_str(), exe.c_str(), nullptr);
+                        execl(exe.c_str(), exe.c_str(), nullptr);
                         perror("execl");
                         exit(1);
                     } else {
