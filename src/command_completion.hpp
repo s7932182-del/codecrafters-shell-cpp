@@ -34,7 +34,7 @@ private:
 
             // Tab completion for executable
 
-            std::vector<std::string> directories = getExePath();   // Return the path of all executable
+            std::vector<std::string> directories = getExePath(); // Return the path of all executable
             for (const auto &dir: directories) {
                 for (const auto &entry: fs::directory_iterator(dir)) {
                     std::string exe = entry.path().filename().string();
@@ -58,8 +58,6 @@ private:
         return nullptr;
     }
 
-
-
 public:
     TabCompletor() = delete;
 
@@ -67,26 +65,37 @@ public:
         if (start == 0)
             return rl_completion_matches(text, command_generator);
         else {
-            const char * line = rl_line_buffer;
-            const std::string cmd(line,start-1);
-            const std::string prev_word(line,start);
+            const char *line = rl_line_buffer;
+            const std::string cmd(line, start - 1);
+            const std::string prev_word(line, start);
             if (prev_word == (cmd + ' ')) {
-                auto it  = COMPLETE::script_list.find(cmd);
+                auto it = COMPLETE::script_list.find(cmd);
                 if (it != COMPLETE::script_list.end()) {
                     const std::string exe = it->second;
+                    char buffer[256];
+                    int pipeFd[2];
+                    pipe(pipeFd);
                     const pid_t pid = fork();
                     if (pid == 0) {
+                        // child process
+                        close(pipeFd[0]);
+                        dup2(pipeFd[1], STDOUT_FILENO);
+                        close(pipeFd[1]);
                         execlp(exe.c_str(), cmd.c_str(), nullptr);
+                        perror("execlp");
+                        exit(1);
+                    } else {
+                        close(pipeFd[1]);
+                        ssize_t bytes = read(pipeFd[0], buffer, 256);
+                        buffer[bytes] = '\0';
                     }
-
                     wait(nullptr);
+                    std::cout << buffer << std::endl;
                 }
-            }else {
-                return  nullptr;
+            } else {
+                return nullptr;
             }
-
         }
-
     }
 };
 
