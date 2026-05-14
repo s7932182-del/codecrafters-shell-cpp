@@ -72,7 +72,7 @@ public:
                 auto it = COMPLETE::script_list.find(cmd);
                 if (it != COMPLETE::script_list.end()) {
                     const std::string exe = it->second;
-                    char buffer[256];
+                    char ** buffer = static_cast<char **> (malloc(256 * sizeof(char *)));
                     int pipeFd[2];
                     pipe(pipeFd);
                     const pid_t pid = fork();
@@ -87,10 +87,10 @@ public:
                     } else {
                         close(pipeFd[1]);
                         ssize_t bytes = read(pipeFd[0], buffer, 256);
-                        buffer[bytes] = '\0';
+                        buffer[bytes] = nullptr;
                     }
                     wait(nullptr);
-                    std::cout << buffer <<  " " << std::endl;
+                    return  buffer;
                 }
             } else {
                 return nullptr;
