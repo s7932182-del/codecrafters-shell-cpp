@@ -110,7 +110,9 @@ public:
                         }
 
                         // Convert to char** for readline
-                        if (matches.empty()) return nullptr;
+                        if (matches.empty()) {
+                            return  rl_completion_matches(text, rl_filename_completion_function);
+                        };
 
                         char** result = static_cast<char**>(malloc((matches.size() + 1) * sizeof(char*)));
                         for (size_t i = 0; i < matches.size(); i++) {
