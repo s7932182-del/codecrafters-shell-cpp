@@ -57,7 +57,66 @@ private:
 
         return nullptr;
     }
+   static char * argument_generator(const char *text, const int state) {
+        if (state == 0) {
+            matches.clear();
 
+            const int cursor_at  = rl_point;
+            const char * line = rl_line_buffer;
+            std::string cmd;
+
+            for (int  i = 0; i<cursor_at; i++) {
+                if (line[i] == ' ') {
+                    cmd = std::string(line,i);
+                    break;
+                }
+            }
+
+            if (!cmd.empty()) {
+                auto it  = COMPLETE::script_list.find(cmd);
+                if (it != COMPLETE::script_list.end()) {
+                    const std::string exe = it->second;
+                    int pipeFd[2];
+                    pipe(pipeFd);
+                    const pid_t pid = fork();
+                    if (pid == 0) {
+                        close(pipeFd[0]);
+                        dup2(pipeFd[1], STDOUT_FILENO);
+                        close(pipeFd[1]);
+                        execl(cmd.c_str(), exe.c_str(), nullptr);
+                    } else {
+                        close(pipeFd[1]);
+                        std::string output;
+                        char buffer[1024];
+                        ssize_t bytes;
+                        while ((bytes = read(pipeFd[0], buffer, sizeof(buffer))) > 0) {
+                            buffer[bytes] = '\0';
+                            output += buffer;
+                        }
+                       close(pipeFd[0]);
+                        wait(nullptr);
+                        std::istringstream iss(output);
+
+                        std::string match;
+                        while (iss >> match) {
+                            matches.push_back(match);
+                        }
+
+                    }
+                }
+            }
+        }
+
+        // Return matches that match current text
+        while (match_index < matches.size()) {
+            const std::string& match = matches[match_index++];
+            if (match.compare(0, strlen(text), text) == 0) {
+                return strdup(match.c_str());
+            }
+        }
+        return nullptr;
+
+    }
 public:
     TabCompletor() = delete;
 
@@ -65,69 +124,22 @@ public:
         if (start == 0)
             return rl_completion_matches(text, command_generator);
         else {
-            const char *line = rl_line_buffer;
+            const char* line = rl_line_buffer;
             const std::string cmd(line, start - 1);
             const std::string prev_word(line, start);
+
             if (prev_word == (cmd + ' ')) {
                 auto it = COMPLETE::script_list.find(cmd);
                 if (it != COMPLETE::script_list.end()) {
-                    const std::string exe = it->second;
-                    int pipeFd[2];
-                    pipe(pipeFd);
-                    const pid_t pid = fork();
-                    if (pid == 0) {
-                        // child process
-                        close(pipeFd[0]);
-                        dup2(pipeFd[1], STDOUT_FILENO);
-                        close(pipeFd[1]);
-                        execlp(exe.c_str(), cmd.c_str(), nullptr);
-                        perror("execlp");
-                        exit(1);
-                    } else {
-                        // Parent process
-                        close(pipeFd[1]);
-
-                        // Read output into a string
-                        std::string output;
-                        char buffer[4096];
-                        ssize_t bytes;
-                        while ((bytes = read(pipeFd[0], buffer, sizeof(buffer) - 1)) > 0) {
-                            buffer[bytes] = '\0';
-                            output += buffer;
-                        }
-                        close(pipeFd[0]);
-                        wait(nullptr);
-
-                        // Parse output into completion matches
-                        std::vector<std::string> matches;
-                        std::istringstream iss(output);
-                        std::string match;
-                        while (iss >> match) {
-                            // Filter matches based on current text
-                            if (match.compare(0, strlen(text), text) == 0) {
-                                matches.push_back(match);
-                            }
-                        }
-
-                        // Convert to char** for readline
-                        if (matches.empty()) {
-                            return  rl_completion_matches(text, rl_filename_completion_function);
-                        };
-
-                        char** result = static_cast<char**>(malloc((matches.size() + 1) * sizeof(char*)));
-                        for (size_t i = 0; i < matches.size(); i++) {
-                            result[i] = strdup(matches[i].c_str());
-                        }
-                        result[matches.size()] = nullptr;
-
-                        return result;
-                    }
-
+                    // Use the custom generator for this command
+                    return rl_completion_matches(text, argument_generator);
                 }
-            } else {
-                return nullptr;
             }
+
+            // Fallback to filename completion
+            return rl_completion_matches(text, rl_filename_completion_function);
         }
+        return  nullptr;
     }
 };
 
