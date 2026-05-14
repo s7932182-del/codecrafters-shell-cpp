@@ -72,8 +72,6 @@ public:
                 auto it = COMPLETE::script_list.find(cmd);
                 if (it != COMPLETE::script_list.end()) {
                     const std::string exe = it->second;
-                    std::cout << "This is running ... " <<std:: endl;
-                    char ** buffer = static_cast<char **> (malloc(256 * sizeof(char *)));
                     int pipeFd[2];
                     pipe(pipeFd);
                     const pid_t pid = fork();
@@ -86,12 +84,43 @@ public:
                         perror("execlp");
                         exit(1);
                     } else {
+                        // Parent process
                         close(pipeFd[1]);
-                        ssize_t bytes = read(pipeFd[0], buffer, 256);
-                        buffer[bytes] = nullptr;
+
+                        // Read output into a string
+                        std::string output;
+                        char buffer[4096];
+                        ssize_t bytes;
+                        while ((bytes = read(pipeFd[0], buffer, sizeof(buffer) - 1)) > 0) {
+                            buffer[bytes] = '\0';
+                            output += buffer;
+                        }
+                        close(pipeFd[0]);
+                        wait(nullptr);
+
+                        // Parse output into completion matches
+                        std::vector<std::string> matches;
+                        std::istringstream iss(output);
+                        std::string match;
+                        while (iss >> match) {
+                            // Filter matches based on current text
+                            if (match.compare(0, strlen(text), text) == 0) {
+                                matches.push_back(match);
+                            }
+                        }
+
+                        // Convert to char** for readline
+                        if (matches.empty()) return nullptr;
+
+                        char** result = static_cast<char**>(malloc((matches.size() + 1) * sizeof(char*)));
+                        for (size_t i = 0; i < matches.size(); i++) {
+                            result[i] = strdup(matches[i].c_str());
+                        }
+                        result[matches.size()] = nullptr;
+
+                        return result;
                     }
-                    wait(nullptr);
-                    return  buffer;
+
                 }
             } else {
                 return nullptr;
