@@ -14,7 +14,7 @@
 #include "command_executer.hpp"
 #include "backgroundJob.hpp"
 
-std::string l_trim(std::string &input) {
+std::string l_trim(const std::string &input) {
   int st = 0, end = input.length() - 1;
 
   while (st <= end && isspace(input[st]))

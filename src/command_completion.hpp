@@ -13,49 +13,37 @@
 namespace fs = std::filesystem;
 
 
-
-class TabCompletor
-{
+class TabCompletor {
 private:
     static std::vector<std::string> matches;
     static size_t match_index;
 
-    static char *command_generator(const char *text, int state)
-    {
-
-        if (state == 0)
-        {
+    static char *command_generator(const char *text, const int state) {
+        if (state == 0) {
             matches.clear();
-            std::string prefix(text);
+            const std::string prefix(text);
 
-            auto &builtin_list = Builtin<Parser>::getMap();
+            auto &builtin_list = Builtin<Parser>::getMap(); // Return the builtin commadn
 
-            for (auto it = builtin_list.begin(); it != builtin_list.end(); ++it)
-            {
-                if (it->second->get_name().find(prefix) == 0)
-                {
-                    matches.push_back(it->second->get_name());
+            for (auto &it: builtin_list) {
+                if (it.second->get_name().find(prefix) == 0) {
+                    matches.push_back(it.second->get_name());
                 }
             }
-
 
 
             // Tab completion for executable
 
-            std::vector<std::string> directories = getExePath();
+            std::vector<std::string> directories = getExePath();   // Return the path of all executable
+            for (const auto &dir: directories) {
+                for (const auto &entry: fs::directory_iterator(dir)) {
+                    std::string exe = entry.path().filename().string();
 
-
-            for(auto dir: directories) {
-
-                for(const auto& entry: fs::directory_iterator(dir)) {
-                     std::string exe = entry.path().filename().string();
-
-                     if(exe.find(prefix) == 0){
-                         matches.push_back(exe);
-                     }
+                    if (exe.find(prefix) == 0) {
+                        matches.push_back(exe);
+                    }
                 }
             }
-
 
 
             match_index = 0;
@@ -63,25 +51,42 @@ private:
             // if(const)
         }
 
-        if (match_index < matches.size())
-        {
+        if (match_index < matches.size()) {
             return strdup(matches[match_index++].c_str());
         }
 
         return nullptr;
     }
 
-    TabCompletor();
+
 
 public:
-    static char **my_completion(const char *text, int start, int /*end */)
-    {
+    TabCompletor() = delete;
+
+    static char **my_completion(const char *text, const int start, const int end) {
         if (start == 0)
-        {
             return rl_completion_matches(text, command_generator);
+        else {
+            const char * line = rl_line_buffer;
+            const std::string cmd(line,start-1);
+            const std::string prev_word(line,start);
+            if (prev_word == (cmd + ' ')) {
+                auto it  = COMPLETE::script_list.find(cmd);
+                if (it != COMPLETE::script_list.end()) {
+                    const std::string exe = it->second;
+                    const pid_t pid = fork();
+                    if (pid == 0) {
+                        execlp(exe.c_str(), cmd.c_str(), nullptr);
+                    }
+
+                    wait(nullptr);
+                }
+            }else {
+                return  nullptr;
+            }
+
         }
 
-        return nullptr;
     }
 };
 
