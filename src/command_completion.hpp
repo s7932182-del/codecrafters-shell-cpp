@@ -72,6 +72,7 @@ public:
                 auto it = COMPLETE::script_list.find(cmd);
                 if (it != COMPLETE::script_list.end()) {
                     const std::string exe = it->second;
+                    std::cout << "This is running ... " <<std:: endl;
                     char ** buffer = static_cast<char **> (malloc(256 * sizeof(char *)));
                     int pipeFd[2];
                     pipe(pipeFd);
