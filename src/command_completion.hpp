@@ -87,7 +87,8 @@ public:
                     } else {
                         close(pipeFd[1]);
                         ssize_t bytes = read(pipeFd[0], buffer, 256);
-                        buffer[bytes] = '\0';
+                        buffer[bytes] = ' ';
+                        buffer[bytes + 1] = '\0';
                     }
                     wait(nullptr);
                     std::cout << buffer << std::endl;
