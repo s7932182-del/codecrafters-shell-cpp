@@ -208,7 +208,7 @@ std::vector<JOB::job_info> JOB::background_jobs;
 
 
 
-JOB::JOB() : Builtin("job") {
+JOB::JOB() : Builtin("jobs") {
 };
 
 std::string JOB::get_name() {
@@ -303,5 +303,24 @@ void COMPLETE::execute(const std::vector<std::string> &args) {
              script_list.erase(cmd);
         }
     }
+
+}
+
+
+
+// Implementation of Declare  CLASS
+
+
+DECLARE::DECLARE(): Builtin("declare") {}
+
+DECLARE &DECLARE::getInstance() {
+    static DECLARE instance;
+    return instance;
+}
+std::string DECLARE::get_name() {
+    return this->name;
+}
+
+void DECLARE::execute(const std::vector<std::string> &args) {
 
 }

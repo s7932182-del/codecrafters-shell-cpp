@@ -180,4 +180,14 @@ class COMPLETE final : public Builtin<Parser> {
     std::string get_name() override;
     static std::unordered_map<std::string,std::string> script_list;
 };
+
+
+class DECLARE final : public Builtin<Parser> {
+    private:
+    DECLARE();
+    public:
+    static DECLARE &getInstance();
+    void execute(const std::vector<std::string> &args) override;
+    std::string get_name() override;
+};
 #endif
