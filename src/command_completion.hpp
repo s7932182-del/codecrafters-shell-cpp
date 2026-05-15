@@ -81,6 +81,7 @@ private:
             cmd = arg1 = std::string(words[0]);
             arg2 = text;
             if (words.size() == 3) arg3 = words[1];
+            else arg3 = cmd;
 
 
             if (!cmd.empty()) {
