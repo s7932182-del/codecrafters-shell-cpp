@@ -31,6 +31,7 @@ void registerBuiltin() {
   Builtin<Parser>::register_command("history", &HISTORY::getInstance());
   Builtin<Parser>::register_command("jobs", &JOB::getInstance());
   Builtin<Parser>::register_command("complete", &COMPLETE::getInstance());
+  Builtin<Parser>::register_command("declare", &DECLARE::getInstance());
 
 
 }
