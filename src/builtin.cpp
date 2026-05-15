@@ -300,7 +300,7 @@ void COMPLETE::execute(const std::vector<std::string> &args) {
         } else if (arg == "-r") {
             ++it;
             const std::string cmd = *it;
-            it = script_list.erase(cmd);
+             script_list.erase(cmd);
         }
     }
 
