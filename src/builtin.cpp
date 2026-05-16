@@ -326,7 +326,9 @@ void DECLARE::execute(const std::vector<std::string> &args){
            const auto &arg = *it;
            if (arg == "-p") {
                ++it;
-               std::cout << "declare: variable: not found" << std::endl;
+               const std::string variable_name = *it;
+               ++it;
+               std::cout << "declare: " << variable_name << ": not found" << std::endl;
            }
        }
 }
