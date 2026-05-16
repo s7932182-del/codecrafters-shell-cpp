@@ -6,6 +6,7 @@
 #include<iomanip>
 #include <string_view>
 #include <ranges>
+#include<regex>
 
 namespace fs = std::filesystem;
 
@@ -336,14 +337,20 @@ void DECLARE::execute(const std::vector<std::string> &args){
                }
 
            }else {
-               const std::string&  variable_exp = *it;
-               const std::string& delimiter = "=";
+               const std::string &variable_exp = *it;
+               const std::string &delimiter = "=";
+               std::regex pattern(R"([A-Za-z_][A-Za-z0-9_]*)");
 
                auto parts = variable_exp | std::views::split(delimiter);
 
                auto parts_it = parts.begin();
 
                auto key = std::string((*parts_it).begin(), (*parts_it).end());
+               if (!std::regex_match(key, pattern))
+                   std::cout << "declare: " << std::quoted(variable_exp, '\'') << ": " << "not a valid identifier" <<
+                           std::endl;
+
+
                ++parts_it;
                const auto value = std::string((*parts_it).begin(), (*parts_it).end());
 
