@@ -219,7 +219,7 @@ std::string Parser::resolve_dollar(std::string argument) {
            const std::string variable_name = argument.substr(i + 1);
            const std::string variable_value = variable_list.at(variable_name);
            resolve_str += variable_value;
-           i = variable_name.length();
+           i += variable_name.length()+1;
        } else {
            resolve_str.push_back(argument[i]);
            i++;
