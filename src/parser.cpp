@@ -33,7 +33,8 @@ Parser::Parser(const std::string& input) {
                     st++;
                 }
                 st++;
-            } else if (input[st] == '\"') {
+            }
+            else if (input[st] == '\"') {
                 st++;
                 while (input[st] != '\"') {
                     argument.push_back(input[st]);
@@ -46,14 +47,16 @@ Parser::Parser(const std::string& input) {
                     }
                 }
                 st++;
-            } else if (input[st] == '\\') {
+            }
+            else if (input[st] == '\\') {
                 // argument.push_back(input[st+1]);
                 st++;
                 if (st <= end) {
                     argument.push_back(input[st]);
                     st++;
                 }
-            } else if (input[st] == '>') {
+            }
+            else if (input[st] == '>') {
                 if (input[st - 1] == '1' || isspace(input[st - 1])) {
                     if (!isspace(input[st - 1]))
                         argument.pop_back();
@@ -72,7 +75,8 @@ Parser::Parser(const std::string& input) {
                 }
 
                 st++;
-            } else if (input[st] == '|') {
+            }
+            else if (input[st] == '|') {
                 // this->argv_for_mult_cmd.push_back(this->argv);
                 // this->argv.clear();
                 // is_command = false;
@@ -85,7 +89,8 @@ Parser::Parser(const std::string& input) {
                 is_command = false;
 
                 break;
-            } else {
+            }
+            else {
                 if (!isspace(input[st]))
                     argument.push_back(input[st]);
                 st++;
@@ -132,6 +137,9 @@ Parser::Parser(const std::string& input) {
                 this->error_file = argument;
             } else {
                 // this->argv.push_back(argument);
+                if (argument[0] == '$') {
+                    argument = DECLARE::variable_list.at(argument.substr(1));
+                }
                 current_cmd.argv.push_back(argument);
             }
         }
