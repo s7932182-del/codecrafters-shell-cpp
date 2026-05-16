@@ -1,6 +1,8 @@
 #include "parser.hpp"
 #include <vector>
 #include <algorithm>
+#include <complex>
+
 #include "redirection.hpp"
 #include "builtin.hpp"
 #include <string>
@@ -137,10 +139,8 @@ Parser::Parser(const std::string& input) {
                 this->error_file = argument;
             } else {
                 // this->argv.push_back(argument);
-                if (argument[0] == '$') {
-                    argument = DECLARE::variable_list.at(argument.substr(1));
-                }
-                current_cmd.argv.push_back(argument);
+
+                current_cmd.argv.push_back(resolve_dollar(argument));
             }
         }
         // st++;
@@ -188,6 +188,21 @@ std::queue<Parser::Cmd> Parser::get_cmd_args_queue() const {
 
 std::string  Parser::get_cmd_string() const {
     return this->cmd_string;
+}
+
+
+
+std::string Parser::resolve_dollar(std::string argument) {
+    size_t pos = argument.find('$');
+    if (pos == std::string::npos) {
+        return argument;
+    } else {
+        const std::string before_dollar = argument.substr(0, pos);
+        const std::string after_dollar = argument.substr(pos + 1);
+        const std::string& variable_value = DECLARE::variable_list.at(after_dollar);
+        return  before_dollar+variable_value;
+    }
+
 }
 
 

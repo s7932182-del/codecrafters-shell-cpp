@@ -51,7 +51,8 @@ private:
     [[nodiscard]] bool get_valid_cmd() const;
     [[nodiscard]] bool get_is_exit() const;
     [[nodiscard]] std::string get_cmd_string() const;
-    std::string get_cmd_name() const;
+    // [[nodiscard]] std::string get_cmd_name() const;
+    static std::string resolve_dollar(std::string argument);
 };
 
 #endif
