@@ -139,8 +139,9 @@ Parser::Parser(const std::string& input) {
                 this->error_file = argument;
             } else {
                 // this->argv.push_back(argument);
-
-                current_cmd.argv.push_back(resolve_dollar(argument));
+                const std::string resolve_str = resolve_dollar(argument);
+                if (!resolve_str.empty())
+                   current_cmd.argv.push_back(resolve_dollar(argument));
             }
         }
         // st++;
