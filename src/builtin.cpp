@@ -330,7 +330,7 @@ void DECLARE::execute(const std::vector<std::string> &args){
                if (variable_it != variable_list.end()) {
 
                    const std::string& variable_value = variable_it->second;
-                   std::cout << "declare -- " << variable_name << " = " << std::quoted(variable_value,'"') << std::endl;
+                   std::cout << "declare -- " << variable_name << " =" << std::quoted(variable_value,'"') << std::endl;
                } else {
                    std::cout << "declare: " << variable_name << ": not found" << std::endl;
                }
