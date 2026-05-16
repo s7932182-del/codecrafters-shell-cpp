@@ -193,15 +193,41 @@ std::string  Parser::get_cmd_string() const {
 
 
 std::string Parser::resolve_dollar(std::string argument) {
-    size_t pos = argument.find('$');
-    if (pos == std::string::npos) {
+   //  $ declare Item=widget
+   // $ declare Foo1=Bar2
+   // $ ./custom_exe_1234 stock_${Item}_id ${Foo1}
+
+    if (argument.find('$') == std::string::npos) {
         return argument;
-    } else {
-        const std::string before_dollar = argument.substr(0, pos);
-        const std::string after_dollar = argument.substr(pos + 1);
-        const std::string& variable_value = DECLARE::variable_list.at(after_dollar);
-        return  before_dollar+variable_value;
     }
+
+   size_t i = 0;
+   // std::string variable_name = "";
+   std::string resolve_str;
+   const auto &variable_list = DECLARE::variable_list;
+   while (i < argument.length()) {
+       if (argument[i] == '$' && argument[i + 1] == '{') {
+           const size_t pos_of_right_braces = argument.find('}', i + 2);
+           const size_t start = i+2;
+           const size_t end = pos_of_right_braces;
+
+           const std::string variable_name = argument.substr(i + 2, end-start);
+           const std::string variable_value = variable_list.at(variable_name);
+           resolve_str += variable_value;
+           i += pos_of_right_braces +1;
+       } else if (argument[i] == '$') {
+           const std::string variable_name = argument.substr(i + 1);
+           const std::string variable_value = variable_list.at(variable_name);
+           resolve_str += variable_value;
+           i += variable_name.length();
+       } else {
+           resolve_str.push_back(argument[i]);
+           i++;
+       }
+   }
+
+   return resolve_str;
+
 
 }
 
