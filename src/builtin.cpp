@@ -272,10 +272,6 @@ COMPLETE &COMPLETE::getInstance() {
 }
 
 void COMPLETE::execute(const std::vector<std::string> &args) {
-    // const std::string& pFlag = args[1];
-    // // std::cout << args[0] << " " << args[1] << args[2] << std::endl;
-    // const std::string& pFlag_cmd = args[2];
-
 
     for (auto it = args.begin() + 1; it != args.end(); ++it) {
         const auto &arg = *it;
@@ -327,7 +323,6 @@ void DECLARE::execute(const std::vector<std::string> &args){
            if (arg == "-p") {
                ++it;
                const std::string variable_name = *it;
-               ++it;
                std::cout << "declare: " << variable_name << ": not found" << std::endl;
            }
        }
