@@ -349,7 +349,7 @@ void DECLARE::execute(const std::vector<std::string> &args){
 
                variable_list[key] = value;
 
-               std::cout<< std::endl;
+               // std::cout<< std::endl;
 
 
            }
