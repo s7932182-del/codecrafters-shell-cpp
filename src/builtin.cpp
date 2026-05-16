@@ -4,6 +4,8 @@
 #include <readline/history.h>
 #include "backgroundJob.hpp"
 #include<iomanip>
+#include <string_view>
+#include <ranges>
 
 namespace fs = std::filesystem;
 
@@ -306,6 +308,7 @@ void COMPLETE::execute(const std::vector<std::string> &args) {
 
 // Implementation of Declare  CLASS
 
+std::unordered_map<std::string,std::string> DECLARE::variable_list;
 
 DECLARE::DECLARE(): Builtin("declare") {}
 
@@ -323,7 +326,32 @@ void DECLARE::execute(const std::vector<std::string> &args){
            if (arg == "-p") {
                ++it;
                const std::string variable_name = *it;
-               std::cout << "declare: " << variable_name << ": not found" << std::endl;
+                const auto& variable_it = variable_list.find(variable_name);
+               if (variable_it != variable_list.end()) {
+
+                   const std::string& variable_value = variable_it->second;
+                   std::cout << "declare -- " << variable_name << " = " << std::quoted(variable_value,'"') << std::endl;
+               } else {
+                   std::cout << "declare: " << variable_name << ": not found" << std::endl;
+               }
+
+           }else {
+               const std::string&  variable_exp = *it;
+               const std::string& delimiter = "=";
+
+               auto parts = variable_exp | std::views::split(delimiter);
+
+               auto parts_it = parts.begin();
+
+               auto key = std::string((*parts_it).begin(), (*parts_it).end());
+               ++parts_it;
+               const auto value = std::string((*parts_it).begin(), (*parts_it).end());
+
+               variable_list[key] = value;
+
+               std::cout<< std::endl;
+
+
            }
        }
 }

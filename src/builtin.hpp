@@ -189,5 +189,6 @@ class DECLARE final : public Builtin<Parser> {
     static DECLARE &getInstance();
     void execute(const std::vector<std::string> &args) override;
     std::string get_name() override;
+    static std::unordered_map<std::string,std::string> variable_list;
 };
 #endif
