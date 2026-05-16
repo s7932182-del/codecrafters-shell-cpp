@@ -347,7 +347,7 @@ void DECLARE::execute(const std::vector<std::string> &args){
 
                auto key = std::string((*parts_it).begin(), (*parts_it).end());
                if (!std::regex_match(key, pattern))
-                   std::cout << "declare: " << std::quoted(variable_exp, '\'') << ": " << "not a valid identifier" <<
+                   std::cout << "declare: `" << variable_exp << "': " << "not a valid identifier" <<
                            std::endl;
 
 
