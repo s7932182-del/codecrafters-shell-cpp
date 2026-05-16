@@ -210,16 +210,21 @@ std::string Parser::resolve_dollar(std::string argument) {
            const size_t pos_of_right_braces = argument.find('}', i + 2);
            const size_t start = i+2;
            const size_t end = pos_of_right_braces;
-
            const std::string variable_name = argument.substr(i + 2, end-start);
-           const std::string variable_value = variable_list.at(variable_name);
-           resolve_str += variable_value;
+           if (variable_list.contains(variable_name)) {
+               const std::string variable_value = variable_list.at(variable_name);
+               resolve_str += variable_value;
+
+           }
            i = pos_of_right_braces +1;
        } else if (argument[i] == '$') {
            const std::string variable_name = argument.substr(i + 1);
-           const std::string variable_value = variable_list.at(variable_name);
-           resolve_str += variable_value;
+           if (variable_list.contains(variable_name)) {
+               const std::string variable_value = variable_list.at(variable_name);
+               resolve_str += variable_value;
+           }
            i += variable_name.length()+1;
+
        } else {
            resolve_str.push_back(argument[i]);
            i++;
