@@ -321,6 +321,12 @@ std::string DECLARE::get_name() {
     return this->name;
 }
 
-void DECLARE::execute(const std::vector<std::string> &args) {
-
+void DECLARE::execute(const std::vector<std::string> &args){
+       for (auto it = args.begin() + 1; it != args.end(); ++it) {
+           const auto &arg = *it;
+           if (arg == "-p") {
+               ++it;
+               std::cout << "declare: variable: not found" << std::endl;
+           }
+       }
 }
